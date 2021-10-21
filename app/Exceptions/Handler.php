@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler
 {
@@ -37,5 +38,22 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    /*
+     * To customise the unauthenticated messages from handler
+     */
+
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        $data = [];
+        if ($request->expectsJson()) {
+            $message =  $exception->getMessage();
+            return response([
+                'data' => $data,
+                'message' => $message,
+                'status_code' => BADREQUEST,
+            ]);
+        }
     }
 }

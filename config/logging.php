@@ -100,6 +100,12 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+         // Add the following lines to integrate with Stackdriver:
+         'stackdriver' => [
+            'driver' => 'custom',
+            'via' => App\Logging\CreateStackdriverLogger::class,
+            'level' => 'debug',
+        ],
     ],
 
 ];
