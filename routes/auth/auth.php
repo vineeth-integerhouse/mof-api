@@ -12,6 +12,9 @@ Route::group([
     /*Customer api routes for login*/
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
+
+    Route::post('reset_password', [AuthController::class, 'reset_password']);
+    Route::post('forgot_password', [AuthController::class, 'forgot_password']);
    
 
     /* Seeder routes*/
