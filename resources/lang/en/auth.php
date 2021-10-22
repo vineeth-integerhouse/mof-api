@@ -20,5 +20,6 @@ return [
     'login_success' => 'Login success',
     'login_failed' => 'Login failed',
     'logout_success' => 'Logout success',
+    'deleted'=> 'User is deleted'
 
 ];

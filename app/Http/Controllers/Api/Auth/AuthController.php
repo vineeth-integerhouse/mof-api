@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
 use App\Rules\StrongPassword;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -116,5 +118,75 @@ class AuthController extends Controller
             'message' => __('auth.logout_success'),
             'status_code' => SUCCESSCODE
         ]);
+    }
+
+    public function forgot_password(Request $request)
+    {
+        $message = '';
+        $validate_data = Validator::make($request->all(), [
+            'email' => 'email|required',
+        ]);
+        if ($validate_data->fails()) {
+            $errors = $validate_data->errors();
+            $message =  implode(', ', $errors->all());
+            $status_code = BADREQUEST;
+        } else {
+            $user = User::withTrashed()->where('email', $request->email)->where('deleted_at', '!=', null)->count();
+
+            if ($user!=0) {
+                $message = __('auth.deleted');
+                $status_code = BADREQUEST;
+            } else {
+                $message  = Password::sendResetLink(
+                    $request->only('email')
+                );
+                if ($message=='passwords.user') {
+                    $status_code = BADREQUEST;
+                } else {
+                    $status_code = SUCCESSCODE;
+                }
+            }
+        }
+        return response([
+            'data' => [],
+            'message' => __($message),
+            'status' => $status_code,
+        ], $status_code);
+    }
+
+
+    public function reset_password(Request $request)
+    {
+        $validate_data = Validator::make($request->all(), [
+            'email' => 'required',
+            'token' => 'required',
+            'password' => ['required', 'confirmed', new StrongPassword]
+        ]);
+        if ($validate_data->fails()) {
+            $errors = $validate_data->errors();
+            $message =  implode(', ', $errors->all());
+            $status_code = BADREQUEST;
+        } else {
+            $status = Password::reset(
+                $request->only('email', 'password', 'password_confirmation', 'token'),
+                function ($user, $password) use ($request) {
+                    $user->forceFill([
+                        'password' => Hash::make($password)
+                    ]);
+                    $user->save();
+                }
+            );
+            if (Password::PASSWORD_RESET) {
+                $status_code = SUCCESSCODE;
+            } else {
+                $status_code = BADREQUEST;
+            }
+            $message =  __($status);
+        }
+        return response([
+            'data' => [],
+            'message' => $message,
+            'status' => $status_code
+        ], $status_code);
     }
 }
