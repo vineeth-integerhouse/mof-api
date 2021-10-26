@@ -29,7 +29,7 @@ class SuperAdmin
         } else {
             $user_role = Auth::guard('api')->user()->role->role_name;
            
-            if ($user_role !== USER_ROLE_SUPERADMIN ) {
+            if ($user_role !== USER_ROLE_SUPERADMIN) {
                 return response([
                     'message'     => __('auth.unauthorized'),
                     'status'      => false,
