@@ -86,4 +86,68 @@ class User extends Authenticatable
    
         return $users;
     }
+
+    public static function active_user_list($user_role, $request)
+    {
+        $current_user = get_user();
+
+        $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
+        $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
+        $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
+
+        $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
+        $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+ 
+ 
+
+        $users = User::select(
+            'name',
+            'username',
+            'email',
+            'id',
+            'profile_pic',
+        )->where('id', '!=', $current_user->id)
+        ->where('role_id', $user_role)
+        ->where(
+            function ($query) use ($request) {
+                return $query
+                ->orWhere('name', 'like', "%{$request->search_string}%")
+                ->orWhere('email', 'like', "%{$request->search_string}%");
+            }
+        )
+            ->orderBy($sort_column, $sort_direction)->paginate($limit, $offset);
+ 
+        return $users;
+    }
+
+    public static function active_artist_list($user_role, $request)
+    {
+        $current_user = get_user();
+
+        $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
+        $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
+        $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
+
+        $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
+        $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+ 
+ 
+        $users = User::select(
+            'name',
+            'email',
+            'id',
+            'profile_pic',
+        )->where('id', '!=', $current_user->id)
+        ->where('role_id', $user_role)
+        ->where(
+            function ($query) use ($request) {
+                return $query
+                ->orWhere('name', 'like', "%{$request->search_string}%")
+                ->orWhere('email', 'like', "%{$request->search_string}%");
+            }
+        )
+            ->orderBy($sort_column, $sort_direction)->paginate($limit, $offset);
+ 
+        return $users;
+    }
 }

@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\ArtistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,13 +35,13 @@ Route::group([
     Route::group([
         'middleware' => ['auth:api', 'superadmin']
     ], function () {
-        Route::get('admin/logout', [AuthController::class, 'logout']);
-
+       
         /********************** Manage Admin ************ */
         Route::post('admin/admin', [AdminController::class, 'add']);
         Route::delete('admin/admin/{admin_id}', [AdminController::class, 'delete']);
         Route::put('admin/admin/{admin_id}', [AdminController::class, 'update']);
         Route::get('admin/admin', [AdminController::class, 'list']);
+
     });
 });
 
@@ -51,6 +53,16 @@ Route::group([
         'middleware' => ['auth:api', 'admin']
     ], function () {
         Route::get('admin/logout', [AuthController::class, 'logout']);
+
+         /********************** Manage User ************ */
+        Route::get('admin/user', [UserController::class, 'list']);
+        Route::delete('admin/user/{user_id}', [UserController::class, 'delete']);
+        Route::put('admin/user/{user_id}', [UserController::class, 'update']);
+
+         /********************** Manage Artist ************ */
+         Route::get('admin/artist', [ArtistController::class, 'list']);
+         Route::delete('admin/artist/{artist_id}', [ArtistController::class, 'delete']);
+         Route::put('admin/artist/{artist_id}', [ArtistController::class, 'update']);
 
     });
 });
