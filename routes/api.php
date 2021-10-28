@@ -33,6 +33,24 @@ Route::group([
     'middleware' => 'api'
 ], function () {
     Route::group([
+        'middleware' => ['auth:api', 'artist']
+    ], function () {
+        Route::get('artist/logout', [AuthController::class, 'logout']);
+
+          /********************** Settings ************ */
+
+          Route::put('artist/password', [ArtistController::class, 'update_password']);
+          Route::put('artist/email', [ArtistController::class, 'update_email']);
+       
+
+    });
+});
+
+
+Route::group([
+    'middleware' => 'api'
+], function () {
+    Route::group([
         'middleware' => ['auth:api', 'superadmin']
     ], function () {
        
@@ -63,6 +81,9 @@ Route::group([
          Route::get('admin/artist', [ArtistController::class, 'list']);
          Route::delete('admin/artist/{artist_id}', [ArtistController::class, 'delete']);
          Route::put('admin/artist/{artist_id}', [ArtistController::class, 'update']);
+
+          /********************** Settings ************ */
+         Route::put('admin/settings', [AdminController::class, 'settings']);
 
     });
 });

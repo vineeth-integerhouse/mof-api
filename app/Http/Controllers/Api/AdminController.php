@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Rules\StrongPassword;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
@@ -114,7 +115,6 @@ class AdminController extends Controller
                 $message = __('user.update_failed') . ' ' . $e->getMessage();
                 $status_code = BADREQUEST;
             }
-        
         }
 
         return response([
@@ -124,24 +124,24 @@ class AdminController extends Controller
          ], $status_code);
     }
 
-     /*Admin Listing*/
-     public function list(Request $request)
-     {
-         $user_data = [];
-         $report_data = [];
-         $message =  __('user.user_list_failed');
-         $status_code = BADREQUEST;
+    /*Admin Listing*/
+    public function list(Request $request)
+    {
+        $user_data = [];
+        $report_data = [];
+        $message =  __('user.user_list_failed');
+        $status_code = BADREQUEST;
   
-         $user_data = User::active_admin_list($request->input('role'), $request);
-         $message = __('user.user_list_success');
-         $status_code = SUCCESSCODE;
+        $user_data = User::active_admin_list($request->input('role'), $request);
+        $message = __('user.user_list_success');
+        $status_code = SUCCESSCODE;
  
-         return response([
+        return response([
              'data'        => $user_data,
              'message'     => $message,
              'status_code' => $status_code
          ], $status_code);
-     }
+    }
 
     /*Admin Delete*/
     public function delete(Request $request)
@@ -171,5 +171,78 @@ class AdminController extends Controller
             'message'     => $message,
             'status_code' => $status_code
         ], $status_code);
+    }
+
+    /*Admin Settings */
+
+    public function settings(Request $request)
+    {
+        $data = [];
+        $error = [];
+        $users_count = 0;
+        $existing_password_check = true;
+        $password_confirmation = true;
+        $message = __('user.update_failed');
+        $status_code = BADREQUEST;
+   
+        $current_user=get_user();
+   
+        if ($current_user) {
+            try {
+                $update = [];
+                if (isset($request->password) && isset($request->password_confirmation)) {
+                    if ($request->password === $request->password_confirmation) {
+                        $update['password'] = bcrypt($request->password);
+                    } else {
+                        $password_confirmation = false;
+                    }
+                }
+                if (isset($request->email)) {
+                    $update['email'] = $request->email;
+                    $users_count = User::withTrashed()->where('email', $request->email)->where('id', '!=', $current_user->id)->count();
+                }
+                if ($users_count == 0 && $password_confirmation == true) {
+                    if (isset($request->name)) {
+                        $update['name'] = $request->name;
+                    }
+               
+                    $update['updated_at'] = date("Y-m-d H:i:s");
+                    if (count($update) != 0) {
+                        DB::table('users')->where('id', $current_user->id)->update($update);
+                    }
+                    $message = __('user.user_settings');
+                    $status_code = SUCCESSCODE;
+   
+                    $data= User::select(
+                        'id',
+                        'name',
+                        'email',
+                        'profile_pic'
+                    )->where('id', $current_user->id)->get()->first();
+                }
+                $error = [];
+                if ($users_count!=0) {
+                    $data=[];
+                 
+                    array_push($error, array('type'=>'email','message'=> __('user.email_in_use')));
+                    $status_code = BADREQUEST;
+                }
+                if ($password_confirmation == false) {
+                    $data=[];
+                    array_push($error, array('type'=>'password_confirmation','message'=> __('user.password_not_match')));
+                    $status_code = BADREQUEST;
+                }
+            } catch (Exception $e) {
+                $message = __('user.user_settings_failed') . ' ' . $e->getMessage();
+                $status_code = BADREQUEST;
+            }
+        }
+              
+        return response([
+         'data' => $data,
+         'error' => $error,
+         'message' => $message,
+         'status_code' => $status_code,
+       ], $status_code);
     }
 }
