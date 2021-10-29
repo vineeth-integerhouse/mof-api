@@ -28,14 +28,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        if (isset($request->role) && $request->role == 2) {
-            ResetPasswordNotification::createUrlUsing(function ($user, string $token) {
-                return config("auth.admin_reset_password_base_url") . $token . '&email=' . urlencode($user->email);
-            });
-        } else {
-            ResetPasswordNotification::createUrlUsing(function ($user, string $token) {
-                return config("auth.reset_password_base_url") . $token . '&email=' . urlencode($user->email);
-            });
-        }
+        ResetPasswordNotification::createUrlUsing(function ($user, string $token) {
+            return config("auth.reset_password_base_url") . $token . '&email=' . urlencode($user->email);
+        });
     }
 }

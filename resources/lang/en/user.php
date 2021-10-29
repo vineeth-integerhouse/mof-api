@@ -30,4 +30,15 @@ return [
     'email'=> 'New Email Updated',
     'email_not_match' => 'The email confirmation does not match.', 
     'wrong_email' => 'Current email is incorrect',
+
+    'setup_success'=> 'Setup profile sucess',
+    'setup_failed'=> 'Setup profile failed',
+
+    'dashboard_success' => 'Dashboard widegets successfully fetched',
+    'dashboard_failed' => 'Dashboard widegets has failed',
+
+    'statistics_success' => 'Data successfully fetched',
+    'statistics_failed' => 'Failed to fetch data',
+
+
 ];

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ArtistController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UserController;
 
 /*
@@ -25,6 +26,10 @@ Route::group([
         'middleware' => 'auth:api'
     ], function () {
         Route::get('logout', [AuthController::class, 'logout']);
+
+        /********************** Setup account ************ */
+
+        Route::put('setupaccount', [UserController::class, 'setupaccount']);
     });
 });
 
@@ -37,12 +42,18 @@ Route::group([
     ], function () {
         Route::get('artist/logout', [AuthController::class, 'logout']);
 
-          /********************** Settings ************ */
+        /********************** Settings ************ */
 
-          Route::put('artist/password', [ArtistController::class, 'update_password']);
-          Route::put('artist/email', [ArtistController::class, 'update_email']);
-       
+        Route::put('artist/password', [ArtistController::class, 'update_password']);
+        Route::put('artist/email', [ArtistController::class, 'update_email']);
 
+        /********************** Setup profile ************ */
+
+        Route::put('artist/setupprofile', [ArtistController::class, 'setupprofile']);
+
+        /********************** Delete account ************ */
+
+        Route::delete('artist', [ArtistController::class, 'delete']);
     });
 });
 
@@ -60,6 +71,8 @@ Route::group([
         Route::put('admin/admin/{admin_id}', [AdminController::class, 'update']);
         Route::get('admin/admin', [AdminController::class, 'list']);
 
+        /*********************** Statictics******************** */
+        Route::get('admin/statistcs', [DashboardController::class, 'admin_statistcs']);
     });
 });
 
@@ -72,19 +85,18 @@ Route::group([
     ], function () {
         Route::get('admin/logout', [AuthController::class, 'logout']);
 
-         /********************** Manage User ************ */
+        /********************** Manage User ************ */
         Route::get('admin/user', [UserController::class, 'list']);
         Route::delete('admin/user/{user_id}', [UserController::class, 'delete']);
         Route::put('admin/user/{user_id}', [UserController::class, 'update']);
 
-         /********************** Manage Artist ************ */
-         Route::get('admin/artist', [ArtistController::class, 'list']);
-         Route::delete('admin/artist/{artist_id}', [ArtistController::class, 'delete']);
-         Route::put('admin/artist/{artist_id}', [ArtistController::class, 'update']);
+        /********************** Manage Artist ************ */
+        Route::get('admin/artist', [ArtistController::class, 'list']);
+        Route::delete('admin/artist/{artist_id}', [ArtistController::class, 'admin_delete']);
+        Route::put('admin/artist/{artist_id}', [ArtistController::class, 'update']);
 
-          /********************** Settings ************ */
-         Route::put('admin/settings', [AdminController::class, 'settings']);
-
+        /********************** Settings ************ */
+        Route::put('admin/settings', [AdminController::class, 'settings']);
     });
 });
 

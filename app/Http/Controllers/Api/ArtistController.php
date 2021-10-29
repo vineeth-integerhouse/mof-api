@@ -13,6 +13,58 @@ use Illuminate\Support\Facades\Hash;
 
 class ArtistController extends Controller
 {
+    public function setupprofile(Request $request)
+    {
+        $data = [];
+      
+        $message = '';
+        $status_code = '';
+
+        $current_user=get_user();
+
+        try {
+            $update = [];
+            if (isset($request->username)) {
+                $update['username'] = $request->username;
+            }
+            if (isset($request->bio)) {
+                $update['bio'] = $request->bio;
+            }
+    
+             
+            $update['profile_pic'] = $request->photo;
+
+            $update['updated_at'] = date("Y-m-d H:i:s");
+
+            if (count($update) != 0) {
+                $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+                DB::table('users')->where('id', $current_user->id)->where('role_id', $role)->update($update);
+            }
+            $message = __('user.setup_success');
+            $status_code = SUCCESSCODE;
+        } catch (Exception $e) {
+            $message = __('user.setup_failed') . ' ' . $e->getMessage();
+            $status_code = BADREQUEST;
+        }
+       
+        $data= User::select(
+            'id',
+            'name',
+            'username',
+            'email',
+            'profile_pic',
+            'bio'
+        )->where('id', $current_user->id)->get()->first();
+    
+
+        return response([
+            'data'        => $data,
+            'message'     => $message,
+            'status_code' => $status_code
+        ], $status_code);
+    }
+
+
     /*Artist Listing*/
     public function list(Request $request)
     {
@@ -86,9 +138,9 @@ class ArtistController extends Controller
     }
    
 
-    /*Artist Delete*/
+    /*Artist Delete From Admin*/
 
-    public function delete(Request $request, $artist_id)
+    public function admin_delete(Request $request, $artist_id)
     {
         $user_data = [];
         $data      = [];
@@ -97,9 +149,13 @@ class ArtistController extends Controller
 
         $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
 
+        $user = User::where('id', $artist_id)->first();
+
         $user_data = User::where('id', $artist_id)->where('role_id', $role)->delete();
        
         if ($user_data === 1) {
+            $data['id']   = $user->id;
+            $data['email'] = $user->email;
             $message = __('user.artist_delete_success');
             $status_code = SUCCESSCODE;
         } else {
@@ -114,10 +170,9 @@ class ArtistController extends Controller
         ], $status_code);
     }
 
-    /*Artist Settings */
+
 
     /* Update password */
-
 
     public function update_password(Request $request)
     {
@@ -208,7 +263,6 @@ class ArtistController extends Controller
 
                 if (isset($request->email) && isset($request->email_confirmation) && isset($request->current_email)) {
                     if ($request->email === $request->email_confirmation) {
-
                         if ($request->current_email==$current_user->email) {
                             $update['email'] = $request->email;
                         } else {
@@ -264,7 +318,6 @@ class ArtistController extends Controller
                 $message = __('user.user_settings_failed') . ' ' . $e->getMessage();
                 $status_code = BADREQUEST;
             }
-        
         }
         return response([
             'data' => $data,
@@ -272,5 +325,37 @@ class ArtistController extends Controller
             'message' => $message,
             'status_code' => $status_code,
         ], $status_code);
+    }
+
+    /*Artist Delete*/
+
+    public function delete(Request $request)
+    {
+        $user_data = [];
+        $data      = [];
+        $message =  __('user.invalid_user');
+        $status_code = BADREQUEST;
+
+        $current_user=get_user();
+ 
+        $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+
+        $user_data = User::where('id', $current_user->id)->where('role_id', $role)->delete();
+        
+        if ($user_data === 1) {
+            $data['id']   = $current_user->id;
+            $data['email'] = $current_user->email;
+            $message = __('user.artist_delete_success');
+            $status_code = SUCCESSCODE;
+        } else {
+            $message = __('user.not_artist');
+            $status_code = BADREQUEST;
+        }
+     
+        return response([
+             'data'        => $data,
+             'message'     => $message,
+             'status_code' => $status_code
+         ], $status_code);
     }
 }
