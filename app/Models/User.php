@@ -150,4 +150,24 @@ class User extends Authenticatable
  
         return $users;
     }
+
+    public static function users_count($user_role)
+    {
+        $count  = User::with('role')
+            ->whereHas('role', function (Builder $query) use ($user_role) {
+                $query->select('id')->where('role_name', 'User');
+            })->count();
+
+        return $count;
+    }
+
+    public static function artists_count($user_role)
+    {
+        $count  = User::with('role')
+            ->whereHas('role', function (Builder $query) use ($user_role) {
+                $query->select('id')->where('role_name', 'Artist');
+            })->count();
+
+        return $count;
+    }
 }

@@ -13,6 +13,52 @@ use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
+    /*Account setup*/
+    public function setupaccount(Request $request)
+    {
+        $data = [];
+      
+        $message = '';
+        $status_code = '';
+
+        $current_user=get_user();
+
+        try {
+            $update = [];
+            if (isset($request->username)) {
+                $update['username'] = $request->username;
+            }
+             
+            $update['profile_pic'] = $request->photo;
+
+            $update['updated_at'] = date("Y-m-d H:i:s");
+
+            if (count($update) != 0) {
+                $role= Role::where('role_name', USER_ROLE_USER)->first()->id;
+                DB::table('users')->where('id', $current_user->id)->where('role_id', $role)->update($update);
+            }
+            $message = __('user.setup_success');
+            $status_code = SUCCESSCODE;
+        } catch (Exception $e) {
+            $message = __('user.setup_failed') . ' ' . $e->getMessage();
+            $status_code = BADREQUEST;
+        }
+       
+        $data= User::select(
+            'id',
+            'name',
+            'username',
+            'email',
+            'profile_pic',
+        )->where('id', $current_user->id)->get()->first();
+    
+
+        return response([
+            'data'        => $data,
+            'message'     => $message,
+            'status_code' => $status_code
+        ], $status_code);
+    }
     /*User Listing*/
     public function list(Request $request)
     {
@@ -97,9 +143,13 @@ class UserController extends Controller
 
         $role= Role::where('role_name', USER_ROLE_USER)->first()->id;
 
+        $user = User::where('id', $user_id)->first();
+
         $user_data = User::where('id', $user_id)->where('role_id', $role)->delete();
        
         if ($user_data === 1) {
+            $data['id']   = $user->id;
+            $data['email'] = $user->email;
             $message = __('user.user_delete_success');
             $status_code = SUCCESSCODE;
         } else {

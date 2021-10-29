@@ -144,21 +144,25 @@ class AdminController extends Controller
     }
 
     /*Admin Delete*/
-    public function delete(Request $request)
+    public function delete(Request $request, $admin_id)
     {
         $user_data = [];
         $data      = [];
         $message =  __('user.invalid_user');
         $status_code = BADREQUEST;
      
+        $user = User::where('id', $admin_id)->first();
+
         $user_data = User::select(
             DB::raw('role_name AS role'),
             DB::raw('users.id AS id'),
         )->leftJoin('roles', 'users.role_id', '=', 'roles.id')
          ->where('role_name', '!=', 'User')
-         ->where(DB::raw('users.id'), '=', $request->id)->delete();
-       
+         ->where(DB::raw('users.id'), '=', $admin_id)->delete();
+ 
         if ($user_data === 1) {
+            $data['id']   = $user->id;
+            $data['email'] = $user->email;
             $message = __('user.admin_delete_success');
             $status_code = SUCCESSCODE;
         } else {
