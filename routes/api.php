@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\UserController;
 
 /*
@@ -28,8 +29,10 @@ Route::group([
         Route::get('logout', [AuthController::class, 'logout']);
 
         /********************** Setup account ************ */
-
         Route::put('setupaccount', [UserController::class, 'setupaccount']);
+
+         /********************** Subscription************ */
+         Route::post('subscription', [SubscriptionController::class, 'add']);
     });
 });
 
