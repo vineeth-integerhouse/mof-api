@@ -40,5 +40,7 @@ return [
     'statistics_success' => 'Data successfully fetched',
     'statistics_failed' => 'Failed to fetch data',
 
+    'subscription'=> 'Subscription added successfully',
+
 
 ];
