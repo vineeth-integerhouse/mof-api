@@ -10,5 +10,5 @@ class Post extends Model
 {
     use HasFactory, SoftDeletes;
 
-    public $fillable = ['user_id','title', 'image', 'video', 'audio','live_stream'];
+    public $fillable = ['user_id','title', 'image', 'video', 'audio','live_stream', 'who_can_see_post_id', 'when_to_post_id'];
 }
