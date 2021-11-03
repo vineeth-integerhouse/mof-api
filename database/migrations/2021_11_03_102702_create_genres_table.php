@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePostsTable extends Migration
+class CreateGenresTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,20 +13,15 @@ class CreatePostsTable extends Migration
      */
     public function up()
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('genres', function (Blueprint $table) {
             $table->id();
-
-            $table->string('title')->nullable();
-            $table->string('content')->nullable();
-            $table->text('image')->nullable();
-            $table->text('video')->nullable();
-            $table->text('audio')->nullable();
-            $table->text('live_stream')->nullable();
 
             $table->bigInteger('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
-            $table->softDeletes();
+            $table->bigInteger('genre_type_id')->unsigned()->nullable();
+            $table->foreign('genre_type_id')->references('id')->on('genre_types')->onDelete('cascade')->onUpdate('cascade');
+
             $table->timestamps();
         });
     }
@@ -38,6 +33,6 @@ class CreatePostsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('genres');
     }
 }

@@ -42,5 +42,9 @@ return [
 
     'subscription'=> 'Subscription added successfully',
 
+    'upload_success' => 'File uploaded successfully',
+    'post_success'=>'Successfully posted',
+    'post_failed'=>'Failed to post'
+
 
 ];
