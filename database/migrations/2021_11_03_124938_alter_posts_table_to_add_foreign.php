@@ -19,6 +19,9 @@ class AlterPostsTableToAddForeign extends Migration
 
             $table->bigInteger('who_can_see_post_id')->unsigned()->nullable();
             $table->foreign('who_can_see_post_id')->references('id')->on('who_can_see_posts')->onDelete('cascade')->onUpdate('cascade');
+
+            $table->bigInteger('post_type_id')->unsigned()->nullable();
+            $table->foreign('post_type_id')->references('id')->on('post_types')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
@@ -32,6 +35,7 @@ class AlterPostsTableToAddForeign extends Migration
         Schema::table('posts', function (Blueprint $table) {
             $table->dropColumn('who_can_see_post_id');
             $table->dropColumn('when_to_post_id');
+            $table->dropColumn('post_type_id');
         });
     }
 }

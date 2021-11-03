@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\UserController;
 
 /*
@@ -33,6 +35,9 @@ Route::group([
 
          /********************** Subscription************ */
          Route::post('subscription', [SubscriptionController::class, 'add']);
+
+
+         Route::post('upload', [UploadController::class, 'upload']);  
     });
 });
 
@@ -53,6 +58,10 @@ Route::group([
         /********************** Setup profile ************ */
 
         Route::put('artist/setupprofile', [ArtistController::class, 'setupprofile']);
+
+          /********************** Post ************ */
+
+          Route::post('artist/post', [PostController::class, 'add']);
 
         /********************** Delete account ************ */
 
