@@ -156,7 +156,6 @@ class PostController extends Controller
           ], $status_code);
     }
 
-
     public function delete(Request $request, $post_id)
     {
         $user_data = [];
