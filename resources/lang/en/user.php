@@ -44,7 +44,11 @@ return [
 
     'upload_success' => 'File uploaded successfully',
     'post_success'=>'Successfully posted',
-    'post_failed'=>'Failed to post'
+    'post_failed'=>'Failed to post',
+    'post_delete_success'=>'Post deleted successfully',
+    'post_delete_failed'=>'Failed to deleted post',
+    'post_fetch_success'=> 'Post deatails fetched successfully',
+    'post_fetch failed'=> 'Failed to fetch post',
 
 
 ];

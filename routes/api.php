@@ -59,13 +59,19 @@ Route::group([
 
         Route::put('artist/setupprofile', [ArtistController::class, 'setupprofile']);
 
-          /********************** Post ************ */
-
-          Route::post('artist/post', [PostController::class, 'add']);
+         
 
         /********************** Delete account ************ */
 
         Route::delete('artist', [ArtistController::class, 'delete']);
+
+         /********************** Post ************ */
+
+         Route::post('artist/post', [PostController::class, 'add']);
+         Route::put('artist/post/{post_id}', [PostController::class, 'update']);
+         Route::delete('artist/post/{post_id}', [PostController::class, 'delete']);
+         Route::get('artist/post/{post_id}', [PostController::class, 'get']);
+         Route::get('artist/post', [PostController::class, 'list']);
     });
 });
 
@@ -74,7 +80,7 @@ Route::group([
     'middleware' => 'api'
 ], function () {
     Route::group([
-        'middleware' => ['auth:api', 'superadmin']
+        'middleware' => ['auth:api', 'superadmin']  
     ], function () {
        
         /********************** Manage Admin ************ */
