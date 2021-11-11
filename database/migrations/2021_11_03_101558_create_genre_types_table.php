@@ -16,6 +16,7 @@ class CreateGenreTypesTable extends Migration
         Schema::create('genre_types', function (Blueprint $table) {
             $table->id();
             $table->string('genre_option')->unique();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

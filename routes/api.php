@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\UploadController;
@@ -59,8 +60,6 @@ Route::group([
 
         Route::put('artist/setupprofile', [ArtistController::class, 'setupprofile']);
 
-         
-
         /********************** Delete account ************ */
 
         Route::delete('artist', [ArtistController::class, 'delete']);
@@ -72,6 +71,11 @@ Route::group([
          Route::delete('artist/post/{post_id}', [PostController::class, 'delete']);
          Route::get('artist/post/{post_id}', [PostController::class, 'get']);
          Route::get('artist/post', [PostController::class, 'list']);
+
+
+        /*******************  Payments ****************** */
+        Route::post('artist/payment', [PaymentController::class, 'stripe']);
+       
     });
 });
 

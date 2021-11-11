@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'role'=> 'Role Details',
-    'role_fail'=> 'Fetching Role Details failed',
+    'seed_success'=> 'Seeder details',
+    'seed_fail'=> 'Fetching seed details failed',
 ];

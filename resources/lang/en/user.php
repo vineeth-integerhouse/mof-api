@@ -50,5 +50,7 @@ return [
     'post_fetch_success'=> 'Post deatails fetched successfully',
     'post_fetch failed'=> 'Failed to fetch post',
 
+    'payment' => 'Payment Success',
+
 
 ];
