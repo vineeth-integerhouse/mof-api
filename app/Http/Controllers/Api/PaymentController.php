@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Payment;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
@@ -10,7 +11,7 @@ use Stripe\Customer;
 
 class PaymentController extends Controller
 {
-     public function stripe_post(Request $request)
+     public function stripe(Request $request)
     {
         $data = [];
         $validate_data = Validator::make($request->all(), [
@@ -32,7 +33,10 @@ class PaymentController extends Controller
 
             $payment_data = [];
             $payment_data['user_id'] = $current_user->id;
+            $payment_data['name'] = $current_user->name;
             $payment_data['amount'] = $request->amount;
+            $payment_data['payment_date'] = date("Y/m/d");
+            $payment_data['payment_method'] = $request->payment_method;
             $payment_data['stripe_reference_number'] = $data->id;
           
 

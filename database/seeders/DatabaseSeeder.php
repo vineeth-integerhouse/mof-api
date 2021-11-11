@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call(GenreSeeder::class);
+        $this->call(PostTypeSeeder::class);
         $this->call(RoleSeeder::class);
         $this->call(SubscriptionSeeder::class);
         $this->call(WhoCanSeePostSeeder::class);

@@ -16,6 +16,7 @@ class CreateWhocanseepostsTable extends Migration
         Schema::create('who_can_see_posts', function (Blueprint $table) {
             $table->id();
             $table->string('whocanseepost_option')->unique();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

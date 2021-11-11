@@ -16,6 +16,7 @@ class CreateWhenToPostsTable extends Migration
         Schema::create('when_to_posts', function (Blueprint $table) {
             $table->id();
             $table->string('whentopost_option')->unique();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

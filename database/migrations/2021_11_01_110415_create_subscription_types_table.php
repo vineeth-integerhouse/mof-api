@@ -16,6 +16,7 @@ class CreateSubscriptionTypesTable extends Migration
         Schema::create('subscription_types', function (Blueprint $table) {
             $table->id();
             $table->string('subscription_type')->unique();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

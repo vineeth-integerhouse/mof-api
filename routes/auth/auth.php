@@ -32,4 +32,10 @@ Route::group([
 
     /* Seeder routes*/
     Route::get('role', [SeedController::class, 'role']);
+    Route::get('genre_type', [SeedController::class, 'genre_type']);
+    Route::get('post_type', [SeedController::class, 'post_type']);
+    Route::get('subscription_type', [SeedController::class, 'subscription_type']);
+    Route::get('when_to_post', [SeedController::class, 'when_to_post']);
+    Route::get('who_can_see_post', [SeedController::class, 'who_can_see_post']);
+
 });

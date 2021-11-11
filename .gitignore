@@ -12,3 +12,6 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 log
+app.yaml
+/tmp
+composer.lock

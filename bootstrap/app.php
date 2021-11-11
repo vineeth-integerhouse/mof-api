@@ -41,6 +41,21 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
+# [START] Add the following block to `bootstrap/app.php`
+/*
+|--------------------------------------------------------------------------
+| Set Storage Path
+|--------------------------------------------------------------------------
+|
+| This script allows you to override the default storage location used by
+| the  application.  You may set the APP_STORAGE environment variable
+| in your .env file,  if not set the default location will be used. 
+| This will allow you to set the storage path to /tmp for caching in production.
+|
+*/
+$app->useStoragePath(env('APP_STORAGE', base_path() . '/tmp'));
+# [END]
+
 /*
 |--------------------------------------------------------------------------
 | Return The Application
@@ -51,5 +66,7 @@ $app->singleton(
 | from the actual running of the application and sending responses.
 |
 */
+
+$app->useStoragePath(env('APP_STORAGE', base_path() . '/storage'));
 
 return $app;
