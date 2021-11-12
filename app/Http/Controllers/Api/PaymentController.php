@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Customer;
 
+use Illuminate\Support\Facades\DB;
+
 class PaymentController extends Controller
 {
      public function stripe(Request $request)
@@ -50,5 +52,43 @@ class PaymentController extends Controller
             'message' => $message,
             'status_code' => $status_code
         ]);
+    }
+    
+    // listing payments
+    public function fetch_payment(Request $request)
+    {
+        $data = [];
+         $message = __('user.fetch_payment failed');
+         $status_code = BADREQUEST;
+ 
+ 
+         $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
+         $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
+         $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
+ 
+         $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
+         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+ 
+         $payment = Payment::
+         select(
+            'id',
+            'name',
+            'amount',
+            'payment_date',
+            'status',
+            'payment_method',
+            'user_id',
+         )->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+ 
+         if (isset($payment)) {
+            $message = __('user.fetch_payment_success');
+             $status_code = SUCCESSCODE;
+             $data = $payment;
+         }
+         return response([
+             'data' => $data,
+             'message' => $message,
+             'status_code' => $status_code
+         ], $status_code);
     }
 }
