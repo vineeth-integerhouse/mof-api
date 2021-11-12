@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('name')->nullable();
             $table->string('username')->nullable();
             $table->string('bio')->nullable();
+            $table->string('payment_method')->nullable();
             $table->text('profile_pic')->nullable();
 
             $table->softDeletes();
