@@ -75,6 +75,7 @@ class PaymentController extends Controller
             'name',
             'amount',
             'payment_date',
+            'status',
             'payment_method',
             'stripe_reference_number',
             'user_id',
