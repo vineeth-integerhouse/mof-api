@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Genre;
 use App\Models\Role;
+use App\Models\SocialProfile;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -15,12 +17,12 @@ class ArtistController extends Controller
 {
     public function setupprofile(Request $request)
     {
+        $current_user=get_user();
+
         $data = [];
       
         $message = '';
         $status_code = '';
-
-        $current_user=get_user();
 
         try {
             $update = [];
@@ -30,8 +32,10 @@ class ArtistController extends Controller
             if (isset($request->bio)) {
                 $update['bio'] = $request->bio;
             }
+            if (isset($request->payment_method)) {
+                $update['payment_method'] = $request->payment_method;
+            }
     
-             
             $update['profile_pic'] = $request->photo;
 
             $update['updated_at'] = date("Y-m-d H:i:s");
@@ -40,6 +44,20 @@ class ArtistController extends Controller
                 $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
                 DB::table('users')->where('id', $current_user->id)->where('role_id', $role)->update($update);
             }
+
+            $genre= $request->genre_type_id;
+            for ($i=0;$i<count($genre);$i++) {
+                $genre_data = ['user_id'=>$current_user->id, 'genre_type_id' => $request->genre_type_id[$i]];
+                Genre::updateOrCreate($genre_data);
+            }
+    
+            $social_links= $request->social_links;
+            for ($i=0;$i<count($social_links);$i++) {
+                $social_link_data = ['user_id'=>$current_user->id, 'social_profile' => $request->social_links[$i]];
+                SocialProfile::updateOrCreate($social_link_data);
+            }
+
+
             $message = __('user.setup_success');
             $status_code = SUCCESSCODE;
         } catch (Exception $e) {
@@ -47,14 +65,25 @@ class ArtistController extends Controller
             $status_code = BADREQUEST;
         }
        
-        $data= User::select(
+        $data['User']= User::select(
             'id',
             'name',
             'username',
             'email',
             'profile_pic',
-            'bio'
+            'bio',
+            'payment_method',
         )->where('id', $current_user->id)->get()->first();
+
+        $data['Social Links']= SocialProfile::select(
+            'id',
+            'social_profile',    
+        )->where('user_id', $current_user->id)->get();
+
+        $data['Genre']= Genre::select(
+            'id',
+            'genre_type_id',
+        )->where('user_id', $current_user->id)->get();
     
 
         return response([
