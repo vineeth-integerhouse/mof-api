@@ -77,7 +77,6 @@ class PaymentController extends Controller
             'payment_date',
             'status',
             'payment_method',
-            'stripe_reference_number',
             'user_id',
          )->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
  
