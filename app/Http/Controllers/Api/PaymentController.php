@@ -57,7 +57,6 @@ class PaymentController extends Controller
     // listing payments
     public function fetch_payment(Request $request)
     {
-        print_r("hhhhh");
         $data = [];
          $message = __('user.fetch_payment failed');
          $status_code = BADREQUEST;
