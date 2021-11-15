@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
+    /* Add Paymnet */
+
      public function stripe(Request $request)
     {
         $data = [];
@@ -54,8 +56,8 @@ class PaymentController extends Controller
         ]);
     }
     
-    // listing payments
-    public function fetch_payment(Request $request)
+    /* List Payments */
+    public function list(Request $request)
     {
         $data = [];
          $message = __('user.fetch_payment failed');

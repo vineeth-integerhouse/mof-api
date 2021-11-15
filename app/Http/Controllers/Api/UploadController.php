@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Validator;
 
 class UploadController extends Controller
 {
+    /* Upload */
+    
     public function upload(Request $request)
     {
         $data = [];

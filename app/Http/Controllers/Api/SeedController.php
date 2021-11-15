@@ -13,6 +13,8 @@ use App\Models\WhoCanSeePost;
 
 class SeedController extends Controller
 {
+    /* Role Seeder */
+
     public function role(Request $request)
     {
         $data = [];
@@ -34,6 +36,8 @@ class SeedController extends Controller
     }
 
 
+    /* Genre Type Seeder */
+
     public function genre_type(Request $request)
     {
         $data = [];
@@ -53,6 +57,8 @@ class SeedController extends Controller
             'status_code' => $status_code
         ], $status_code);
     }
+
+     /* Post Type Seeder */
 
     public function post_type(Request $request)
     {
@@ -74,6 +80,8 @@ class SeedController extends Controller
         ], $status_code);
     }
 
+     /* Subscription Type Seeder */
+
     public function subscription_type(Request $request)
     {
         $data = [];
@@ -94,6 +102,8 @@ class SeedController extends Controller
         ], $status_code);
     }
 
+     /* WhenToPost Type Seeder */
+
     public function when_to_post(Request $request)
     {
         $data = [];
@@ -113,6 +123,8 @@ class SeedController extends Controller
             'status_code' => $status_code
         ], $status_code);
     }
+
+     /* WhoCanSeePost Type Seeder */
 
     public function who_can_see_post(Request $request)
     {

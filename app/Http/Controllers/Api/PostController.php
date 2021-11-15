@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
+    /* Add Post */
+
     public function add(Request $request)
     {
         $data = [];
@@ -76,6 +78,8 @@ class PostController extends Controller
             'status_code' => $status_code,
         ], $status_code);
     }
+
+    /* Edit Post */
 
     public function update(Request $request, $post_id)
     {
@@ -156,6 +160,8 @@ class PostController extends Controller
           ], $status_code);
     }
 
+    /* Delete Post */
+
     public function delete(Request $request, $post_id)
     {
         $user_data = [];
@@ -184,6 +190,8 @@ class PostController extends Controller
             'status_code' => $status_code
         ], $status_code);
     }
+
+    /* Fetch Post */
 
     public function get(Request $request, $post_id)
     {
@@ -217,7 +225,8 @@ class PostController extends Controller
         ], $status_code);
     }
 
-     /*  Listing Post */
+     /* List Post */
+     
      public function list(Request $request)
      {
          $data = [];

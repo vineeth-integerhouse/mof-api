@@ -54,6 +54,13 @@ return [
 
     'subscription' => 'Subscription successfully added',
     'subscription_failed' => 'Failed to add subscription',
+
+    'add_tour_failed' => 'Failed to add tour',
+    'add_tour_success' => 'Tour successfully added',
+    'tour_delete_success'=>'Tour deleted successfully',
+    'tour_delete_failed'=>'Failed to deleted tour',
+    'tour_fetch_success'=> 'Tour deatails fetched successfully',
+    'tost_fetch failed'=> 'Failed to fetch tost',
    
 
 ];
