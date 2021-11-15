@@ -40,8 +40,6 @@ return [
     'statistics_success' => 'Data successfully fetched',
     'statistics_failed' => 'Failed to fetch data',
 
-    'subscription'=> 'Subscription added successfully',
-
     'upload_success' => 'File uploaded successfully',
     'post_success'=>'Successfully posted',
     'post_failed'=>'Failed to post',
@@ -52,7 +50,10 @@ return [
 
     'payment' => 'Payment Success',
     'fetch_payment failed' => 'Failed to fetch payments',
-    'fetch_payment_success' => 'Payments details fetched successfully'
+    'fetch_payment_success' => 'Payments details fetched successfully',
 
+    'subscription' => 'Subscription successfully added',
+    'subscription_failed' => 'Failed to add subscription',
+   
 
 ];

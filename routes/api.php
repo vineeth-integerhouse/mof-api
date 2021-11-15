@@ -76,6 +76,10 @@ Route::group([
         /*******************  Payments ****************** */
         Route::post('artist/payment', [PaymentController::class, 'stripe']);
         Route::get('artist/payment', [PaymentController::class, 'fetch_payment']);
+
+             /*******************  Subscription ****************** */
+        Route::post('artist/subscription', [SubscriptionController::class, 'add']);
+       
        
     });
 });

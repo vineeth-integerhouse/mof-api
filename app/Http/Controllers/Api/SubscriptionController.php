@@ -12,7 +12,7 @@ class SubscriptionController extends Controller
     {
         $data = [];
         $user_data = [];
-        $message = __('user.admin_add_failed');
+        $message = __('user.subscription_failed');
         $status_code = BADREQUEST;
 
 
