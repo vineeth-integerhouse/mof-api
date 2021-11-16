@@ -38,6 +38,12 @@ Route::group([
 
         /********************** Subscription************ */
         Route::post('subscription', [SubscriptionController::class, 'add']);
+        /********************** Comment ************ */
+
+        Route::post('comment', [CommentController::class, 'add']);
+        Route::get('comment/{post_id}', [CommentController::class, 'fetch']);
+        Route::delete('comment/{comment_id}', [CommentController::class, 'delete']);
+        //  Route::get('artist/tour', [TourController::class, 'list']);
 
 
         Route::post('upload', [UploadController::class, 'upload']);
