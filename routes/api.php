@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TourController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,9 @@ Route::group([
 
 
         Route::post('upload', [UploadController::class, 'upload']);
+
+        /********************** Subscription************ */
+        Route::post('notification', [NotificationController::class, 'notification_settings']);
     });
 });
 
