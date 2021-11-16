@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\TourController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\UserController;
 
@@ -34,11 +35,11 @@ Route::group([
         /********************** Setup account ************ */
         Route::put('setupaccount', [UserController::class, 'setupaccount']);
 
-         /********************** Subscription************ */
-         Route::post('subscription', [SubscriptionController::class, 'add']);
+        /********************** Subscription************ */
+        Route::post('subscription', [SubscriptionController::class, 'add']);
 
 
-         Route::post('upload', [UploadController::class, 'upload']);  
+        Route::post('upload', [UploadController::class, 'upload']);
     });
 });
 
@@ -64,19 +65,29 @@ Route::group([
 
         Route::delete('artist', [ArtistController::class, 'delete']);
 
-         /********************** Post ************ */
+        /********************** Post ************ */
 
-         Route::post('artist/post', [PostController::class, 'add']);
-         Route::put('artist/post/{post_id}', [PostController::class, 'update']);
-         Route::delete('artist/post/{post_id}', [PostController::class, 'delete']);
-         Route::get('artist/post/{post_id}', [PostController::class, 'get']);
-         Route::get('artist/post', [PostController::class, 'list']);
+        Route::post('artist/post', [PostController::class, 'add']);
+        Route::put('artist/post/{post_id}', [PostController::class, 'update']);
+        Route::delete('artist/post/{post_id}', [PostController::class, 'delete']);
+        Route::get('artist/post/{post_id}', [PostController::class, 'get']);
+        Route::get('artist/post', [PostController::class, 'list']);
+
+        /********************** Tour ************ */
+
+        Route::post('artist/tour', [TourController::class, 'add']);
+        Route::put('artist/tour/{tour_id}', [TourController::class, 'update']);
+        Route::get('artist/tour/{user_id}', [TourController::class, 'get']);
+        Route::get('artist/tour', [TourController::class, 'list']);
+        Route::delete('artist/tour/{tour_id}', [TourController::class, 'delete']);
 
 
         /*******************  Payments ****************** */
         Route::post('artist/payment', [PaymentController::class, 'stripe']);
-        Route::get('artist/payment', [PaymentController::class, 'fetch_payment']);
-       
+        Route::get('artist/payment', [PaymentController::class, 'list']);
+
+        /*******************  Subscription ****************** */
+        Route::post('artist/subscription', [SubscriptionController::class, 'add']);
     });
 });
 
@@ -85,7 +96,7 @@ Route::group([
     'middleware' => 'api'
 ], function () {
     Route::group([
-        'middleware' => ['auth:api', 'superadmin']  
+        'middleware' => ['auth:api', 'superadmin']
     ], function () {
        
         /********************** Manage Admin ************ */

@@ -7,12 +7,12 @@ use App\Models\Subscription;
 
 class SubscriptionController extends Controller
 {
-    /* Subscription*/
+    /* Add Subscription*/
     public function add(Request $request)
     {
         $data = [];
         $user_data = [];
-        $message = __('user.admin_add_failed');
+        $message = __('user.subscription_failed');
         $status_code = BADREQUEST;
 
 

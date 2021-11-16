@@ -8,7 +8,8 @@ use App\Models\User;
 
 class DashboardController extends Controller
 {
-    /*  Admin Statictcs*/
+    /* Admin Statictcs */
+    
     public function admin_statistcs(Request $request)
     {
         $widget_data = [];
