@@ -44,6 +44,7 @@ Route::group([
 
         /********************** Notification************ */
         Route::post('notification', [NotificationController::class, 'notification_settings']);
+        Route::get('notification', [NotificationController::class, 'get']);
     });
 });
 
