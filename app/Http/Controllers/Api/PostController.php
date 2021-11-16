@@ -53,24 +53,22 @@ class PostController extends Controller
       
         $inserted_data = Post::create($post_data);
 
-        if (!empty($post)) {
-            $data= Post::select(
-                'id',
-                'title',
-                'content',
-                'image',
-                'video',
-                'audio',
-                'live_stream',
-                'when_to_post_id',
-                'user_id',
-                'who_can_see_post_id',
-                'post_type_id'
-            )->where('id', $inserted_data->id)->get()->first();
-            ;
-            $status_code = SUCCESSCODE;
-            $message = __('user.post_success');
-        }
+        $data= Post::select(
+            'id',
+            'title',
+            'content',
+            'image',
+            'video',
+            'audio',
+            'live_stream',
+            'when_to_post_id',
+            'user_id',
+            'who_can_see_post_id',
+            'post_type_id'
+        )->where('id', $inserted_data->id)->get()->first();
+        ;
+        $status_code = SUCCESSCODE;
+        $message = __('user.post_success');
         
         return response([
             'data' => $data,
@@ -225,47 +223,45 @@ class PostController extends Controller
         ], $status_code);
     }
 
-     /* List Post */
+    /* List Post */
      
-     public function list(Request $request)
-     {
-         $data = [];
-         $message = __('user.post_fetch failed');
-         $status_code = BADREQUEST;
+    public function list(Request $request)
+    {
+        $data = [];
+        $message = __('user.post_fetch failed');
+        $status_code = BADREQUEST;
  
  
-         $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
-         $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
-         $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
+        $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
+        $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
+        $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
  
-         $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
-         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+        $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
+        $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
  
-         $post = Post::
-         select(
-            'id',
-            'title',
-            'content',
-            'image',
-            'video',
-            'audio',
-            'live_stream',
-            'when_to_post_id',
-            'user_id',
-            'who_can_see_post_id',
-            'post_type_id',
+        $post = Post::select(
+             'id',
+             'title',
+             'content',
+             'image',
+             'video',
+             'audio',
+             'live_stream',
+             'when_to_post_id',
+             'user_id',
+             'who_can_see_post_id',
+             'post_type_id',
          )->orderBy(DB::raw('posts.'.$sort_column), $sort_direction)->paginate($limit, $offset);
  
-         if (isset($post)) {
+        if (isset($post)) {
             $message = __('user.post_fetch_success');
-             $status_code = SUCCESSCODE;
-             $data = $post;
-         }
-         return response([
+            $status_code = SUCCESSCODE;
+            $data = $post;
+        }
+        return response([
              'data' => $data,
              'message' => $message,
              'status_code' => $status_code
          ], $status_code);
-     }
- 
+    }
 }

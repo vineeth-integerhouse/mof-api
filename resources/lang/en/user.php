@@ -58,9 +58,16 @@ return [
     'add_tour_failed' => 'Failed to add tour',
     'add_tour_success' => 'Tour successfully added',
     'tour_delete_success'=>'Tour deleted successfully',
-    'tour_delete_failed'=>'Failed to deleted tour',
-    'tour_fetch_success'=> 'Tour deatails fetched successfully',
-    'tost_fetch failed'=> 'Failed to fetch tost',
+    'tour_delete_failed'=>'Failed to delete tour',
+    'tour_fetch_success'=> 'Tour details fetched successfully',
+    'tour_fetch failed'=> 'Failed to fetch tour',
+
+    'add_comment_failed' => 'Failed to add comment',
+    'add_comment_success' => 'Comment successfully added',
+    'comment_fetch_success'=> 'Comment for post fetched successfully',
+    'comment_fetch failed'=> 'Failed to fetch comment',
+    'comment_delete_success'=>'Comment deleted successfully',
+    'comment_delete_failed'=>'Failed to delete comment',
    
 
 ];
