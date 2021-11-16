@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
-    /*Account setup*/
+    /*Account Setup*/
+
     public function setupaccount(Request $request)
     {
         $data = [];
@@ -59,7 +60,8 @@ class UserController extends Controller
             'status_code' => $status_code
         ], $status_code);
     }
-    /*User Listing*/
+
+    /* List User */
     public function list(Request $request)
     {
         $data = [];
@@ -78,7 +80,7 @@ class UserController extends Controller
            ], $status_code);
     }
 
-    /*User Edit*/
+    /* Edit User */
     public function update(Request $request, $user_id)
     {
         $data = [];
@@ -132,7 +134,7 @@ class UserController extends Controller
     }
    
 
-    /*User Delete*/
+    /* Delete User */
 
     public function delete(Request $request, $user_id)
     {

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 
 class ArtistController extends Controller
 {
+    /* Setup Profile */
     public function setupprofile(Request $request)
     {
         $current_user=get_user();
@@ -77,7 +78,7 @@ class ArtistController extends Controller
 
         $data['Social Links']= SocialProfile::select(
             'id',
-            'social_profile',    
+            'social_profile',
         )->where('user_id', $current_user->id)->get();
 
         $data['Genre']= Genre::select(
@@ -94,7 +95,7 @@ class ArtistController extends Controller
     }
 
 
-    /*Artist Listing*/
+    /* List Artist */
     public function list(Request $request)
     {
         $data = [];
@@ -110,10 +111,10 @@ class ArtistController extends Controller
                'data'        => $data,
                'message'     => $message,
                'status_code' => $status_code
-           ], $status_code);
+        ], $status_code);
     }
 
-    /*Artist Edit*/
+    /* Edit Artist */
     public function update(Request $request, $artist_id)
     {
         $data = [];
@@ -163,11 +164,11 @@ class ArtistController extends Controller
                 'data'        => $data,
                 'message'     => $message,
                 'status_code' => $status_code
-            ], $status_code);
+        ], $status_code);
     }
    
 
-    /*Artist Delete From Admin*/
+    /* Delete Artist From Admin */
 
     public function admin_delete(Request $request, $artist_id)
     {
@@ -199,9 +200,7 @@ class ArtistController extends Controller
         ], $status_code);
     }
 
-
-
-    /* Update password */
+    /* Update Password */
 
     public function update_password(Request $request)
     {
@@ -273,6 +272,8 @@ class ArtistController extends Controller
             'status_code' => $status_code,
         ], $status_code);
     }
+
+    /* Update Email */
 
     public function update_email(Request $request)
     {
@@ -356,7 +357,7 @@ class ArtistController extends Controller
         ], $status_code);
     }
 
-    /*Artist Delete*/
+    /* Delete Artist */
 
     public function delete(Request $request)
     {

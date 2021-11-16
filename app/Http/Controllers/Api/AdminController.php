@@ -14,11 +14,11 @@ use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
-    /* New Admin*/
+    /* Add Admin*/
     public function add(Request $request)
     {
         $data = [];
-        $user_data = [];
+       
         $message = __('user.admin_add_failed');
         $status_code = BADREQUEST;
 
@@ -55,7 +55,7 @@ class AdminController extends Controller
         ], $status_code);
     }
 
-    /*Admin Edit*/
+    /* Edit Admin */
     public function update(Request $request, $admin_id)
     {
         $data = [];
@@ -124,7 +124,7 @@ class AdminController extends Controller
          ], $status_code);
     }
 
-    /*Admin Listing*/
+    /* List Admin */
     public function list(Request $request)
     {
         $user_data = [];
@@ -143,7 +143,7 @@ class AdminController extends Controller
          ], $status_code);
     }
 
-    /*Admin Delete*/
+    /* Delete Admin */
     public function delete(Request $request, $admin_id)
     {
         $user_data = [];
@@ -177,7 +177,7 @@ class AdminController extends Controller
         ], $status_code);
     }
 
-    /*Admin Settings */
+    /* Admin Settings */
 
     public function settings(Request $request)
     {
