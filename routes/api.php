@@ -37,8 +37,6 @@ Route::group([
         /********************** Setup account ************ */
         Route::put('setupaccount', [UserController::class, 'setupaccount']);
 
-        /********************** Subscription************ */
-        Route::post('subscription', [SubscriptionController::class, 'add']);
         /********************** Comment ************ */
 
         Route::post('comment', [CommentController::class, 'add']);
