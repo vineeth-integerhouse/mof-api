@@ -42,7 +42,7 @@ Route::group([
 
         Route::post('upload', [UploadController::class, 'upload']);
 
-        /********************** Subscription************ */
+        /********************** Notification************ */
         Route::post('notification', [NotificationController::class, 'notification_settings']);
     });
 });
