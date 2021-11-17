@@ -113,7 +113,7 @@ class TourController extends Controller
     }
 
     /* Fetch Tour*/
-    public function get(Request $request, $user_id)
+    public function get(Request $request, $artist_id)
     {
         $message =  __('user.tour_fetch failed');
         $status_code = BADREQUEST;
@@ -126,7 +126,7 @@ class TourController extends Controller
              'venue',
              'city',
              'ticket_link',
-         )->where('user_id', $user_id)->get();
+         )->where('user_id', $artist_id)->get();
  
         if (isset($data)) {
             $message = __('user.tour_fetch_success');
