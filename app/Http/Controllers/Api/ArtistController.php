@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Hash;
 class ArtistController extends Controller
 {
     /* Setup Profile */
-    public function setupprofile(Request $request)
+    public function set_up_profile(Request $request)
     {
         $current_user=get_user();
 
