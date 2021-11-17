@@ -35,7 +35,7 @@ Route::group([
         Route::get('logout', [AuthController::class, 'logout']);
 
         /********************** Setup account ************ */
-        Route::put('setUpAccount', [UserController::class, 'set_up_account']);
+        Route::put('set_up_account', [UserController::class, 'set_up_account']);
 
         /********************** Comment ************ */
         Route::post('comment', [CommentController::class, 'add']);
@@ -67,7 +67,7 @@ Route::group([
 
         /********************** Setup profile ************ */
 
-        Route::put('artist/setUpProfile', [ArtistController::class, 'set_up_profile']);
+        Route::put('artist/set_up_profile', [ArtistController::class, 'set_up_profile']);
 
         /********************** Delete account ************ */
 
