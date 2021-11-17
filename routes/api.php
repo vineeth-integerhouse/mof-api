@@ -34,7 +34,7 @@
             Route::get('logout', [AuthController::class, 'logout']);
 
             /********************** Setup account ************ */
-            Route::put('setUpAccount', [UserController::class, 'set_up_account']);
+            Route::put('setupaccount', [UserController::class, 'set_up_account']);
 
             /********************** Comment ************ */
 
@@ -62,7 +62,7 @@
 
             /********************** Setup profile ************ */
 
-            Route::put('artist/setUpProfile', [ArtistController::class, 'set_up_profile']);
+            Route::put('artist/setupprofile', [ArtistController::class, 'set_up_profile']);
 
             /********************** Delete account ************ */
 
