@@ -15,7 +15,7 @@ class UserController extends Controller
 {
     /*Account Setup*/
 
-    public function setupaccount(Request $request)
+    public function set_up_account(Request $request)
     {
         $data = [];
       

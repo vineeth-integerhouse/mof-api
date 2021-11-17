@@ -34,17 +34,13 @@
             Route::get('logout', [AuthController::class, 'logout']);
 
             /********************** Setup account ************ */
-            Route::put('setupaccount', [UserController::class, 'setupaccount']);
+            Route::put('setUpAccount', [UserController::class, 'set_up_account']);
 
             /********************** Comment ************ */
 
             Route::post('comment', [CommentController::class, 'add']);
-            Route::get('comment/{post_id}', [CommentController::class, 'fetch']);
+            Route::get('comment/post/{post_id}', [CommentController::class, 'fetch']);
             Route::delete('comment/{comment_id}', [CommentController::class, 'delete']);
-            //  Route::get('artist/tour', [TourController::class, 'list']);
-            
-    
-
 
             Route::post('upload', [UploadController::class, 'upload']);
         });
@@ -66,7 +62,7 @@
 
             /********************** Setup profile ************ */
 
-            Route::put('artist/setupprofile', [ArtistController::class, 'setupprofile']);
+            Route::put('artist/setUpProfile', [ArtistController::class, 'set_up_profile']);
 
             /********************** Delete account ************ */
 
@@ -84,7 +80,7 @@
 
             Route::post('artist/tour', [TourController::class, 'add']);
             Route::put('artist/tour/{tour_id}', [TourController::class, 'update']);
-            Route::get('artist/tour/{user_id}', [TourController::class, 'get']);
+            Route::get('artist/{artist_id}/tour', [TourController::class, 'get']);
             Route::get('artist/tour', [TourController::class, 'list']);
             Route::delete('artist/tour/{tour_id}', [TourController::class, 'delete']);
 
