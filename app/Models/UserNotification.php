@@ -10,5 +10,5 @@ class UserNotification extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable  = ['notification_id', 'status', 'user_id'];
+    protected $fillable  = ['notification_type_id', 'status', 'user_id'];
 }

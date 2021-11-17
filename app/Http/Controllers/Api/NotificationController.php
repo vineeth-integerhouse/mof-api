@@ -20,7 +20,7 @@ class NotificationController extends Controller
         $current_user = get_user();
 
         $validate_data = Validator::make($request->all(), [
-            'notification_id' => 'required',
+            'notification_type_id' => 'required',
             'status' => 'required',
         ]);
 
@@ -29,7 +29,7 @@ class NotificationController extends Controller
             $message =  implode(', ', $errors->all());
         } else {
             $inserted_data = UserNotification::updateOrCreate(
-                [  'notification_id'=> $request->notification_id,
+                [  'notification_type_id'=> $request->notification_type_id,
                 'user_id' => $current_user->id],
                 
                 [
@@ -40,7 +40,7 @@ class NotificationController extends Controller
 
             $data= UserNotification::select(
                 'id',
-                'notification_id',
+                'notification_type_id',
                 'status',
             )->where('id', $inserted_data->id)->get()->first();
 
@@ -66,7 +66,7 @@ class NotificationController extends Controller
         if ($current_user) {
             $data= UserNotification::select(
                 'id',
-                'notification_id',
+                'notification_type_id',
                 'status',
             )->where('user_id', $current_user->id)->get();
 
