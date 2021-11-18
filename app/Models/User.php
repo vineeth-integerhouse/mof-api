@@ -72,7 +72,7 @@ class User extends Authenticatable
                if ($user_role) {
                    $query->where('role_name', $user_role);
                } else {
-                   $query->where('role_name', '!=', 'User');
+                   $query->where('role_name', '!=', 'User')->where('role_name', '!=', 'Artist');;
                }
            })->where(DB::raw('users.id'), '!=', $current_user->id)
               ->where(
