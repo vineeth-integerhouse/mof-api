@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\GenreType;
 use App\Models\PostType;
 use App\Models\Role;
+use App\Models\SocialProfileType;
 use App\Models\SubscriptionType;
 use App\Models\WhenToPost;
 use App\Models\WhoCanSeePost;
@@ -146,4 +147,25 @@ class SeedController extends Controller
         ], $status_code);
     }
 
+      /* Profile Type Seeder */
+
+      public function profile_type(Request $request)
+      {
+          $data = [];
+          $message = __('seeder.seed_fail');
+          $status_code = BADREQUEST;
+  
+          $seed_details = SocialProfileType::select('id', 'profile_type')->get();
+  
+          if (isset($seed_details)) {
+              $message = __('seeder.seed_success');
+              $status_code = SUCCESSCODE;
+              $data = $seed_details;
+          }
+          return response([
+              'data' => $data,
+              'message' => $message,
+              'status_code' => $status_code
+          ], $status_code);
+      }
 }

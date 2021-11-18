@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SocialProfile extends Model
+class SocialProfileType extends Model
 {
     use HasFactory, SoftDeletes;
-    public $fillable = ['user_id','social_profile_type_id', 'social_profile_username'];
 }

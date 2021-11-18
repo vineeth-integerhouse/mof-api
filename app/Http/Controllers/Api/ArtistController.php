@@ -52,13 +52,14 @@ class ArtistController extends Controller
                 Genre::updateOrCreate($genre_data);
             }
     
-            $social_links= $request->social_links;
-            for ($i=0;$i<count($social_links);$i++) {
-                $social_link_data = ['user_id'=>$current_user->id, 'social_profile' => $request->social_links[$i]];
-                SocialProfile::updateOrCreate($social_link_data);
+            $profile_update['social_profile_type_id'] = $request->social_profile_type_id;
+            $profile_update['social_profile_username'] = $request->social_profile_username;
+            $profile_update['user_id']=$current_user->id;
+           
+            if (count($profile_update) != 0) {
+                SocialProfile::updateOrCreate($profile_update);
             }
-
-
+            
             $message = __('user.setup_success');
             $status_code = SUCCESSCODE;
         } catch (Exception $e) {
@@ -78,7 +79,8 @@ class ArtistController extends Controller
 
         $data['Social Links']= SocialProfile::select(
             'id',
-            'social_profile',
+            'social_profile_type_id',
+            'social_profile_username'
         )->where('user_id', $current_user->id)->get();
 
         $data['Genre']= Genre::select(
