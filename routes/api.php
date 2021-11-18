@@ -34,15 +34,18 @@ Route::group([
     ], function () {
         Route::get('logout', [AuthController::class, 'logout']);
 
-            /********************** Setup account ************ */
-            Route::put('setupaccount', [UserController::class, 'set_up_account']);
+        /********************** Setup account ************ */
+        Route::put('setupaccount', [UserController::class, 'set_up_account']);
 
         /********************** Comment ************ */
         Route::post('comment', [CommentController::class, 'add']);
         Route::get('comment/post/{post_id}', [CommentController::class, 'fetch']);
         Route::delete('comment/{comment_id}', [CommentController::class, 'delete']);
 
+        /***************** Payment ************* */
+        Route::post('payment', [PaymentController::class, 'stripe']);
 
+        /***************** Upload ************* */
         Route::post('upload', [UploadController::class, 'upload']);
          
         /********************** Notification************ */
@@ -91,7 +94,6 @@ Route::group([
 
 
         /*******************  Payments ****************** */
-        Route::post('artist/payment', [PaymentController::class, 'stripe']);
         Route::get('artist/payment', [PaymentController::class, 'list']);
 
         /*******************  Subscription ****************** */
@@ -126,7 +128,7 @@ Route::group([
         'middleware' => ['auth:api', 'admin']
     ], function () {
         Route::get('admin/logout', [AuthController::class, 'logout']);
-
+        
         /********************** Manage User ************ */
         Route::get('admin/user', [UserController::class, 'list']);
         Route::delete('admin/user/{user_id}', [UserController::class, 'delete']);
