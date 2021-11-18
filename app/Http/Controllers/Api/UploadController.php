@@ -28,8 +28,6 @@ class UploadController extends Controller
             foreach ($request->file('file') as $file) {
                 $full_file_name = time() . '_' . $file->getClientOriginalName();
                    
- 
-
                 $storage = new StorageClient([
                 'projectId' => config('googlecloud.project_id'),
                 'driver' => 'gcs',
@@ -41,44 +39,21 @@ class UploadController extends Controller
 
                 $bucket = $storage->bucket($storage_bucket_name);
                 $object = $bucket->upload($file, [
-            'name' =>  $full_file_name
+                'name' =>  $full_file_name
              ]);
         
                 $google_storage_url = 'https://storage.googleapi.com/' . $storage_bucket_name. '/'. $full_file_name;
                 array_push($data, $google_storage_url);
             }
             
+            $message=__('user.upload_success');
+            $status_code= SUCCESSCODE;
+        }
 
-
-
-            //     $file=$request->file;
-            //     $full_file_name = time() . '_' . $file->getClientOriginalName();
-   
-            //     $storage = new StorageClient([
-            //         'projectId' => config('googlecloud.project_id'),
-            //         'driver' => 'gcs',
-            //         'key' => config('googlecloud.credentials'),
-            //      ]);
-        
-            //     $storage_bucket_name = config('googlecloud.storage_bucket');
-            //     $file = fopen($file, 'r');
-
-            //     $bucket = $storage->bucket($storage_bucket_name);
-            //     $object = $bucket->upload($file, [
-            //     'name' =>  $full_file_name
-            //      ]);
-        
-            //      $google_storage_url = 'https://storage.googleapi.com/' . $storage_bucket_name. '/'. $full_file_name;
-            //     $message=__('user.upload_success');
-            //     $status_code= SUCCESSCODE;
-            // }
-
-            return response([
+        return response([
             'data' => $data,
             'message' => $message,
             'status_code' => $status_code
         ], $status_code);
-//     }
-        }
     }
 }
