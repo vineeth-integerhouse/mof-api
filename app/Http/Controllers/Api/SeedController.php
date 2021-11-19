@@ -11,6 +11,7 @@ use App\Models\SocialProfileType;
 use App\Models\SubscriptionType;
 use App\Models\WhenToPost;
 use App\Models\WhoCanSeePost;
+use App\Models\NotificationType;
 
 class SeedController extends Controller
 {
@@ -168,4 +169,26 @@ class SeedController extends Controller
               'status_code' => $status_code
           ], $status_code);
       }
+
+    /* Notification Type Seeder */
+
+    public function notification_type(Request $request)
+    {
+        $data = [];
+        $message = __('seeder.seed_fail');
+        $status_code = BADREQUEST;
+
+        $seed_details = NotificationType::select('id', 'notification_type')->get();
+
+        if (isset($seed_details)) {
+            $message = __('seeder.seed_success');
+            $status_code = SUCCESSCODE;
+            $data = $seed_details;
+        }
+        return response([
+            'data' => $data,
+            'message' => $message,
+            'status_code' => $status_code
+        ], $status_code);
+    }
 }

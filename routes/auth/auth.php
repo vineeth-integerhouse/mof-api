@@ -38,5 +38,6 @@ Route::group([
     Route::get('when_to_post', [SeedController::class, 'when_to_post']);
     Route::get('who_can_see_post', [SeedController::class, 'who_can_see_post']);
     Route::get('profile_type', [SeedController::class, 'profile_type']);
+    Route::get('notification_type', [SeedController::class, 'notification_type']);
 
 });
