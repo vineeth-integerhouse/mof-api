@@ -37,5 +37,6 @@ Route::group([
     Route::get('subscription_type', [SeedController::class, 'subscription_type']);
     Route::get('when_to_post', [SeedController::class, 'when_to_post']);
     Route::get('who_can_see_post', [SeedController::class, 'who_can_see_post']);
+    Route::get('profile_type', [SeedController::class, 'profile_type']);
 
 });

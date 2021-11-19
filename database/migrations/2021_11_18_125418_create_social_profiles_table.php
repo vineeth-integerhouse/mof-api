@@ -15,9 +15,14 @@ class CreateSocialProfilesTable extends Migration
     {
         Schema::create('social_profiles', function (Blueprint $table) {
             $table->id();
-            $table->string('social_profile')->nullable();
+
+            $table->bigInteger('social_profile_type_id')->unsigned()->nullable();
+            $table->foreign('social_profile_type_id')->references('id')->on('social_profile_types')->onDelete('cascade')->onUpdate('cascade');
+            
             $table->bigInteger('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+            $table->string('social_profile_username')->nullable();
 
             $table->softDeletes();
             $table->timestamps();
