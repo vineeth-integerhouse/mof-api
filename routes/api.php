@@ -141,6 +141,9 @@ Route::group([
 
         /********************** Settings ************ */
         Route::put('admin/settings', [AdminController::class, 'settings']);
+
+        /********************* Payout ************** */
+        Route::get('admin/payment', [PaymentController::class, 'admin_list']);
     });
 });
 

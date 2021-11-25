@@ -15,7 +15,7 @@ class PaymentController extends Controller
 {
     /* Add Paymnet */
 
-     public function stripe(Request $request)
+    public function stripe(Request $request)
     {
         $data = [];
         $validate_data = Validator::make($request->all(), [
@@ -60,19 +60,17 @@ class PaymentController extends Controller
     public function list(Request $request)
     {
         $data = [];
-         $message = __('user.fetch_payment failed');
-         $status_code = BADREQUEST;
+        $message = __('user.fetch_payment failed');
+        $status_code = BADREQUEST;
  
+        $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
+        $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
+        $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
  
-         $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
-         $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
-         $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
+        $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
+        $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
  
-         $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
-         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
- 
-         $payment = Payment::
-         select(
+        $payment = Payment::select(
             'id',
             'name',
             'amount',
@@ -80,17 +78,55 @@ class PaymentController extends Controller
             'status',
             'payment_method',
             'user_id',
-         )->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+        )->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
  
-         if (isset($payment)) {
+        if (isset($payment)) {
+            $data = $payment;
+            $data['Total Revenue'] = Payment::select('amount')->get()->sum('amount');
             $message = __('user.fetch_payment_success');
-             $status_code = SUCCESSCODE;
-             $data = $payment;
-         }
-         return response([
+            $status_code = SUCCESSCODE;
+        }
+        return response([
              'data' => $data,
              'message' => $message,
              'status_code' => $status_code
          ], $status_code);
+    }
+
+    /*Admin List Payments */
+    public function admin_list(Request $request)
+    {
+        $data = [];
+        $message = __('user.fetch_payment failed');
+        $status_code = BADREQUEST;
+  
+        $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
+        $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
+        $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
+  
+        $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
+        $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+  
+        $payment = Payment::select(
+            'id',
+            'name',
+            'payment_date',
+            'amount',
+            'stripe_reference_number',
+            'status',
+            'user_id',
+        )->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+  
+        if (isset($payment)) {
+            $data = $payment;
+            $data['Total Revenue'] = Payment::select('amount')->get()->sum('amount');
+            $message = __('user.fetch_payment_success');
+            $status_code = SUCCESSCODE;
+        }
+        return response([
+              'data' => $data,
+              'message' => $message,
+              'status_code' => $status_code
+          ], $status_code);
     }
 }
