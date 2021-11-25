@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Payment;
 use App\Models\User;
 
 class DashboardController extends Controller
@@ -21,6 +22,7 @@ class DashboardController extends Controller
 
         $widget_data['Users']  =  User::users_count(USER_ROLE_USER);
         $widget_data['Artists']  =  User::artists_count(USER_ROLE_ARTIST);
+        $widget_data['Total Gross Revenue'] = Payment::select('amount')->get()->sum('amount');
 
         $widget_data['current_user'] = User::select(
             'id',
