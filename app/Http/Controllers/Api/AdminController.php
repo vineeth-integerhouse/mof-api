@@ -18,7 +18,7 @@ class AdminController extends Controller
     public function add(Request $request)
     {
         $data = [];
-       
+        $users=[];
         $message = __('user.admin_add_failed');
         $status_code = BADREQUEST;
 
