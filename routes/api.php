@@ -39,7 +39,7 @@ Route::group([
 
         /********************** Comment ************ */
         Route::post('comment', [CommentController::class, 'add']);
-        Route::get('comment/post/{post_id}', [CommentController::class, 'fetch']);
+        Route::get('post/{post_id}/comment', [CommentController::class, 'fetch']);
         Route::delete('comment/{comment_id}', [CommentController::class, 'delete']);
 
         /***************** Payment ************* */
@@ -110,10 +110,10 @@ Route::group([
     ], function () {
        
         /********************** Manage Admin ************ */
-        Route::post('admin/admin', [AdminController::class, 'add']);
-        Route::delete('admin/admin/{admin_id}', [AdminController::class, 'delete']);
-        Route::put('admin/admin/{admin_id}', [AdminController::class, 'update']);
-        Route::get('admin/admin', [AdminController::class, 'list']);
+        Route::post('admin', [AdminController::class, 'add']);
+        Route::delete('admin/{admin_id}', [AdminController::class, 'delete']);
+        Route::put('admin/{admin_id}', [AdminController::class, 'update']);
+        Route::get('admin', [AdminController::class, 'list']);
 
         /*********************** Statictics******************** */
         Route::get('admin/statistcs', [DashboardController::class, 'admin_statistcs']);
