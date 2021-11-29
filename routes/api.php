@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\TourController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\SeedController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +36,8 @@ Route::group([
         Route::get('logout', [AuthController::class, 'logout']);
 
         /********************** Setup account ************ */
-        Route::put('setupaccount', [UserController::class, 'set_up_account']);
+      
+        Route::put('user', [UserController::class, 'set_up_account']);
 
         /********************** Comment ************ */
         Route::post('comment', [CommentController::class, 'add']);
@@ -51,6 +53,16 @@ Route::group([
         /********************** Notification************ */
         Route::post('notification', [NotificationController::class, 'notification_settings']);
         Route::get('notification', [NotificationController::class, 'get']);
+
+        /* Seeder routes*/
+        Route::get('role', [SeedController::class, 'role']);
+        Route::get('genre_type', [SeedController::class, 'genre_type']);
+        Route::get('post_type', [SeedController::class, 'post_type']);
+        Route::get('subscription_type', [SeedController::class, 'subscription_type']);
+        Route::get('when_to_post', [SeedController::class, 'when_to_post']);
+        Route::get('who_can_see_post', [SeedController::class, 'who_can_see_post']);
+        Route::get('profile_type', [SeedController::class, 'profile_type']);
+        Route::get('notification_type', [SeedController::class, 'notification_type']);
     });
 });
 
@@ -70,7 +82,7 @@ Route::group([
 
         /********************** Setup profile ************ */
 
-        Route::put('artist/setupprofile', [ArtistController::class, 'set_up_profile']);
+        Route::put('artist', [ArtistController::class, 'set_up_profile']);
 
         /********************** Delete account ************ */
 
