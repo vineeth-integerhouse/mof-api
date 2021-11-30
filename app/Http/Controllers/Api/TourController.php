@@ -156,7 +156,7 @@ class TourController extends Controller
              'city',
              'ticket_link',
              'user_id',
-         )->get();
+         )->where('deleted_at', '=', Null)->get();
 
         if (isset($tour)) {
             $message = __('user.tour_fetch_success');
