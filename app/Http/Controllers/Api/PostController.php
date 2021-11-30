@@ -20,6 +20,7 @@ class PostController extends Controller
 
         $current_user = get_user();
 
+        $post_data['post_type_id'] = $request->post_type_id;
         $post_data['when_to_post_id'] = $request->when_to_post_id;
         $post_data['who_can_see_post_id'] = $request->who_can_see_post_id;
         $post_data['user_id'] = $current_user->id;
