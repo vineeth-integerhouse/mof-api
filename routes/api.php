@@ -118,25 +118,6 @@ Route::group([
     'middleware' => 'api'
 ], function () {
     Route::group([
-        'middleware' => ['auth:api', 'superadmin']
-    ], function () {
-       
-        /********************** Manage Admin ************ */
-        Route::post('admin', [AdminController::class, 'add']);
-        Route::delete('admin/{admin_id}', [AdminController::class, 'delete']);
-        Route::put('admin/{admin_id}', [AdminController::class, 'update']);
-        Route::get('admin', [AdminController::class, 'list']);
-
-        /*********************** Statictics******************** */
-        Route::get('admin/statistcs', [DashboardController::class, 'admin_statistcs']);
-    });
-});
-
-
-Route::group([
-    'middleware' => 'api'
-], function () {
-    Route::group([
         'middleware' => ['auth:api', 'admin']
     ], function () {
         Route::get('admin/logout', [AuthController::class, 'logout']);
@@ -155,8 +136,27 @@ Route::group([
         Route::put('admin/settings', [AdminController::class, 'settings']);
 
         /********************* Payout ************** */
-        Route::get('admin/payment', [PaymentController::class, 'admin_list']);
+        Route::get('admin/payment', [PaymentController::class, 'payment_list']);
     });
 });
+
+Route::group([
+    'middleware' => 'api'
+], function () {
+    Route::group([
+        'middleware' => ['auth:api', 'superadmin']
+    ], function () {
+       
+        /********************** Manage Admin ************ */
+        Route::post('admin', [AdminController::class, 'add']);
+        Route::delete('admin/{admin_id}', [AdminController::class, 'delete']);
+        Route::put('admin/{admin_id}', [AdminController::class, 'update']);
+        Route::get('admin', [AdminController::class, 'list']);
+
+        /*********************** Statictics******************** */
+        Route::get('admin/statistcs', [DashboardController::class, 'admin_statistcs']);
+    });
+});
+
 
 require __DIR__ . '/auth/auth.php';

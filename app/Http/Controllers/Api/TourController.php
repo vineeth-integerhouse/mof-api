@@ -126,6 +126,7 @@ class TourController extends Controller
              'venue',
              'city',
              'ticket_link',
+             'deleted_at'
          )->where('user_id', $artist_id)->get();
  
         if (isset($data)) {
