@@ -22,6 +22,7 @@ class PaymentController extends Controller
             'amount' => 'required',
             'stripe_token' => 'required',
             'currency' => 'required',
+            'artist_id' => 'required',
         ]);
 
         if ($validate_data->fails()) {
@@ -42,6 +43,7 @@ class PaymentController extends Controller
             $payment_data['payment_date'] = date("Y/m/d");
             $payment_data['payment_method'] = $request->payment_method;
             $payment_data['stripe_reference_number'] = $data->id;
+            $payment_data['artist_id'] = $request->artist_id;
           
 
             Payment::create($payment_data);
@@ -62,7 +64,7 @@ class PaymentController extends Controller
         $data = [];
         $message = __('user.fetch_payment failed');
         $status_code = BADREQUEST;
- 
+        $current_user = get_user();
         $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
         $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
         $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
@@ -78,7 +80,8 @@ class PaymentController extends Controller
             'status',
             'payment_method',
             'user_id',
-        )->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+            'artist_id',
+        )->where('artist_id', $current_user->id)->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
  
         if (isset($payment)) {
             $data = $payment;
@@ -115,6 +118,7 @@ class PaymentController extends Controller
             'stripe_reference_number',
             'status',
             'user_id',
+            'artist_id',
         )->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
   
         if (isset($payment)) {
