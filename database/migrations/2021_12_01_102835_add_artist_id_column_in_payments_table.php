@@ -15,7 +15,6 @@ class AddArtistIdColumnInPaymentsTable extends Migration
     {
         Schema::table('payments', function (Blueprint $table) {
             $table->bigInteger('artist_id')->unsigned();
-            $table->foreign('artist_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
     }
 
