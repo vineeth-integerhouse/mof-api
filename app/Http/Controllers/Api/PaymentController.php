@@ -94,7 +94,7 @@ class PaymentController extends Controller
     }
 
     /*Admin List Payments */
-    public function admin_list(Request $request)
+    public function payment_list(Request $request)
     {
         $data = [];
         $message = __('user.fetch_payment failed');
