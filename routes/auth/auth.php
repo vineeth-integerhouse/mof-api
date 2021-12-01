@@ -32,5 +32,7 @@ Route::group([
 
 
     Route::post('auth/google', [SocialiteController::class, 'google_login']);
+    Route::post('auth/facebook', [SocialiteController::class, 'facebook_login']);
+
    
 });
