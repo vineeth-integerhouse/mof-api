@@ -113,6 +113,9 @@ return [
     */
 
     'password_timeout' => 10800,
+
     'reset_password_base_url' => env('RESET_PASSWORD_BASE_URL', ''),
+    'admin_reset_password_base_url'=> env('ADMIN_RESET_PASSWORD_BASE_URL', ''),
+    'artist_reset_password_base_url'=> env('ARTIST_RESET_PASSWORD_BASE_URL', ''),
 
 ];
