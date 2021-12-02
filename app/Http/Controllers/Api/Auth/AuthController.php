@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Rules\StrongPassword;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 
@@ -47,6 +48,15 @@ class AuthController extends Controller
 
             $message = __('user.register_success');
             $status_code = SUCCESSCODE;
+
+            try {
+                $details = [
+                'email' => $request->email,
+            ];
+                Mail::to($request->email)->send(new \App\Mail\WelcomeMail($details));
+            } catch (\Exception $e) {
+                $message = "Invalid email given for new user";
+            }
         }
 
         return response([
@@ -88,7 +98,6 @@ class AuthController extends Controller
                     $data = ['access_token' => $access_token, 'user' => $user];
                 } elseif ($user->role->role_name == USER_ROLE_ADMIN) {
                     $data = ['access_token' => $access_token, 'user' => $user];
-                
                 } elseif ($user->role->role_name == USER_ROLE_MODERATOR) {
                     $data = ['access_token' => $access_token, 'user' => $user];
                 } else {
