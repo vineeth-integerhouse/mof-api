@@ -50,10 +50,10 @@ class ResetPasswordNotification extends ResetPassword
         $email = urlencode($notifiable->email);
 
         if ($notifiable->role_id == 3) {
-            $url= config("auth.vet_reset_password_base_url") . $this->token . '&email=' . urlencode($notifiable->email);
+            $url= config("auth.reset_password_base_url") . $this->token . '&email=' . urlencode($notifiable->email);
           
         } elseif ($notifiable->role_id  == 4) {
-            $url=   config("auth.reset_password_base_url") . $this->token . '&email=' . urlencode($notifiable->email);
+            $url=   config("auth.artist_reset_password_base_url") . $this->token . '&email=' . urlencode($notifiable->email);
 
         } else {
             $url=config("auth.admin_reset_password_base_url") . $this->token . '&email=' . urlencode($notifiable->email);
@@ -66,7 +66,7 @@ class ResetPasswordNotification extends ResetPassword
             ->subject(__('passwords.email_password_reset_request_subject'))
             ->view(
                 'emails.reset_password',
-                ['name'=>$notifiable->first_name,'url' => $url, 'body' => $body]
+                ['name'=>$notifiable->name,'url' => $url, 'body' => $body]
             );
     }
 
