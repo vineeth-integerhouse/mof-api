@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Genre;
 use App\Models\Role;
 use App\Models\SocialProfile;
@@ -389,5 +390,42 @@ class ArtistController extends Controller
              'message'     => $message,
              'status_code' => $status_code
          ], $status_code);
+    }
+
+    /* Fetch Artist */
+
+    public function fetch(Request $request, $artist_id)
+    {
+        $message =  __('user.not_artist');
+        $status_code = BADREQUEST;
+  
+        $data= User::withTrashed()->select(
+            'id',
+            'email',
+            'name',
+            'username',
+            'profile_pic',
+            'deleted_at',
+        )->where('id', $artist_id)->get()->first();
+
+        ActivityLog::updateOrCreate(
+            ['artist_id'=> $artist_id,
+            'activity_type'=> "Profile Views"
+           ],
+            [
+           'profile_impressions'=> DB::raw('profile_impressions+1'),
+           ]
+        );
+
+        if (isset($data)) {
+            $message = __('user.user_list_success');
+            $status_code = SUCCESSCODE;
+        }
+  
+        return response([
+              'data'        => $data,
+              'message'     => $message,
+              'status_code' => $status_code
+          ], $status_code);
     }
 }

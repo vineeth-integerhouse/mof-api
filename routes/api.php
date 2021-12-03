@@ -80,6 +80,7 @@ Route::group([
         Route::put('artist/password', [ArtistController::class, 'update_password']);
         Route::put('artist/email', [ArtistController::class, 'update_email']);
 
+
         /********************** Setup profile ************ */
 
         Route::put('artist', [ArtistController::class, 'set_up_profile']);
@@ -112,6 +113,10 @@ Route::group([
         Route::post('artist/subscription', [SubscriptionController::class, 'add']);
         /*******************  Dashboard  ****************** */
         Route::get('artist/dashboard', [DashboardController::class, 'dashboard_statistcs']);
+
+        /********************** fetch profile ************ */
+
+        Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
     });
 });
 

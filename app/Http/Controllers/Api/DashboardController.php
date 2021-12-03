@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Payment;
 use App\Models\User;
 
@@ -51,8 +52,11 @@ class DashboardController extends Controller
 
         $current_user=get_user();
 
-        $widget_data['Total Fans']  =  0;
-        $widget_data['Total Profile Impressions']  =  0;
+        $widget_data['Total Fans']=  0;
+
+        $impression=ActivityLog::where('artist_id', $current_user->id)->get('profile_impressions')->first();
+        $widget_data['Total Profile Impressions']= $impression['profile_impressions'];
+        
         $widget_data['Engagement Rate'] = 0;
         $widget_data['Total Earned'] = 0;
 
