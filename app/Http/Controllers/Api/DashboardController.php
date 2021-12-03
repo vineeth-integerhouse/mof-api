@@ -41,4 +41,35 @@ class DashboardController extends Controller
             'status_code' => $status_code
         ]);
     }
+    
+    public function dashboard_statistcs(Request $request)
+    {
+        $widget_data = [];
+        $data      = [];
+        $message = __('user.statistics_failed');
+        $status_code = BADREQUEST;
+
+        $current_user=get_user();
+
+        $widget_data['Total Fans']  =  0;
+        $widget_data['Total Profile Impressions']  =  0;
+        $widget_data['Engagement Rate'] = 0;
+        $widget_data['Total Earned'] = 0;
+
+        $widget_data['current_user'] = User::select(
+            'id',
+            'role_id',
+            'name',
+            'email',
+        )->where('id', $current_user->id)->get()->first();
+        if ($widget_data) {
+            $message =   __('user.statistics_success');
+            $status_code = SUCCESSCODE;
+        }
+        return response([
+            'data'        => $widget_data,
+            'message'     => $message,
+            'status_code' => $status_code
+        ]);
+    }
 }

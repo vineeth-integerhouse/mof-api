@@ -110,6 +110,8 @@ Route::group([
 
         /*******************  Subscription ****************** */
         Route::post('artist/subscription', [SubscriptionController::class, 'add']);
+        /*******************  Dashboard  ****************** */
+        Route::get('artist/dashboard', [DashboardController::class, 'dashboard_statistcs']);
     });
 });
 
