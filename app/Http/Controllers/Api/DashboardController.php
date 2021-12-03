@@ -20,9 +20,41 @@ class DashboardController extends Controller
 
         $current_user=get_user();
 
-        $widget_data['Users']  =  User::users_count(USER_ROLE_USER);
-        $widget_data['Artists']  =  User::artists_count(USER_ROLE_ARTIST);
+        $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER);
+        $widget_data['Registered Artists']  =  User::artists_count(USER_ROLE_ARTIST);
         $widget_data['Total Gross Revenue'] = Payment::select('amount')->get()->sum('amount');
+        $widget_data['Total Gross Profits'] = 0;
+
+        $widget_data['current_user'] = User::select(
+            'id',
+            'role_id',
+            'name',
+            'email',
+        )->where('id', $current_user->id)->get()->first();
+        if ($widget_data) {
+            $message =   __('user.statistics_success');
+            $status_code = SUCCESSCODE;
+        }
+        return response([
+            'data'        => $widget_data,
+            'message'     => $message,
+            'status_code' => $status_code
+        ]);
+    }
+    
+    public function dashboard_statistcs(Request $request)
+    {
+        $widget_data = [];
+        $data      = [];
+        $message = __('user.statistics_failed');
+        $status_code = BADREQUEST;
+
+        $current_user=get_user();
+
+        $widget_data['Total Fans']  =  0;
+        $widget_data['Total Profile Impressions']  =  0;
+        $widget_data['Engagement Rate'] = 0;
+        $widget_data['Total Earned'] = 0;
 
         $widget_data['current_user'] = User::select(
             'id',
