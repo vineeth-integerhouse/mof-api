@@ -91,7 +91,7 @@ class AdminController extends Controller
                         'role_id',
                         'name',
                         'email',
-                        DB::raw('role_name AS role_name'),
+                        'role_name AS role_name',
                         )->leftJoin('roles', 'users.role_id', '=', 'roles.id'
                     )->where('users.id', $admin_id)->get()->first();
                     $message = __('user.update_success');
@@ -106,7 +106,7 @@ class AdminController extends Controller
                             'role_id',
                             'name',
                             'email',
-                            DB::raw('role_name AS role_name'),
+                            'role_name AS role_name',
                         )->leftJoin('roles', 'users.role_id', '=', 'roles.id'
                         )->where('users.id', $admin_id)->get()->first();
                         $message = __('user.update_success');
