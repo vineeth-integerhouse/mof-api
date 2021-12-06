@@ -64,7 +64,6 @@ class AdminController extends Controller
   
         $user_data = User::find($admin_id);
 
-           
         if ($user_data) {
             try {
                 $update = [];
@@ -77,6 +76,9 @@ class AdminController extends Controller
                 if (isset($request->email)) {
                     $update['email'] = $request->email;
                 }
+                if (isset($request->email)) {
+                    $update['password'] =  bcrypt($request->password);
+                }
 
                 $update['updated_at'] = date("Y-m-d H:i:s");
 
@@ -85,11 +87,13 @@ class AdminController extends Controller
                         DB::table('users')->where('id', $admin_id)->update($update);
                     }
                     $data= User::select(
-                        'id',
+                        'users.id',
                         'role_id',
                         'name',
                         'email',
-                    )->where('id', $admin_id)->get()->first();
+                        DB::raw('role_name AS role_name'),
+                        )->leftJoin('roles', 'users.role_id', '=', 'roles.id'
+                    )->where('users.id', $admin_id)->get()->first();
                     $message = __('user.update_success');
                     $status_code = SUCCESSCODE;
                 } else {
@@ -102,7 +106,9 @@ class AdminController extends Controller
                             'role_id',
                             'name',
                             'email',
-                        )->where('id', $admin_id)->get()->first();
+                            DB::raw('role_name AS role_name'),
+                        )->leftJoin('roles', 'users.role_id', '=', 'roles.id'
+                        )->where('users.id', $admin_id)->get()->first();
                         $message = __('user.update_success');
                         $status_code = SUCCESSCODE;
                     } else {
