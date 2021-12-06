@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddArtistIdColumnInPaymentsTable extends Migration
+class CreateActivityLogsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,13 @@ class AddArtistIdColumnInPaymentsTable extends Migration
      */
     public function up()
     {
-        Schema::table('payments', function (Blueprint $table) {
+        Schema::create('activity_logs', function (Blueprint $table) {
+            $table->id();
+            $table->string('activity_type')->nullable();
             $table->bigInteger('artist_id')->unsigned();
+            $table->string('profile_impressions')->default(0);
+            $table->softDeletes();
+            $table->timestamps();
         });
     }
 
@@ -25,8 +30,6 @@ class AddArtistIdColumnInPaymentsTable extends Migration
      */
     public function down()
     {
-        Schema::table('payments', function (Blueprint $table) {
-            $table->dropColumn('artist_id');
-        });
+        Schema::dropIfExists('activity_logs');
     }
 }
