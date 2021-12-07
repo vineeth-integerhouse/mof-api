@@ -42,7 +42,7 @@ class UploadController extends Controller
                 'name' =>  $full_file_name
              ]);
         
-                $google_storage_url = 'https://storage.googleapi.com/' . $storage_bucket_name. '/'. $full_file_name;
+                $google_storage_url = 'https://storage.googleapis.com/' . $storage_bucket_name. '/'. $full_file_name;
                 array_push($data, $google_storage_url);
             }
             

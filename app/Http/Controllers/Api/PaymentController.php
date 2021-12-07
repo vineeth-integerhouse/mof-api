@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\CardDetail;
 use App\Models\Payment;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
@@ -13,16 +15,20 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
-    /* Add Paymnet */
+    /* Add Payment */
 
     public function stripe(Request $request)
     {
         $data = [];
         $validate_data = Validator::make($request->all(), [
+            'name_on_card'  => 'required',
+            'credit_card_number'  => 'required',
+            'country_region'  => 'required',
+            'zip_code'  => 'required',
             'amount' => 'required',
             'stripe_token' => 'required',
             'currency' => 'required',
-            'artist_id' => 'required',
+            'payee_id' => 'required',
         ]);
 
         if ($validate_data->fails()) {
@@ -35,15 +41,26 @@ class PaymentController extends Controller
             $data = Customer::create([
                 "source" => $request->stripe_token,
             ]);
+            
+    
+            $card_data=[];
+            $card_data['user_id'] = $current_user->id;
+            $card_data['name_on_card'] = $request->name_on_card;
+            $card_data['credit_card_number'] = $request->credit_card_number;
+            $card_data['country_region'] = $request->country_region;
+            $card_data['zip_code'] = $request->zip_code;
+
+            $inserted_data=CardDetail::updateOrCreate($card_data);
 
             $payment_data = [];
-            $payment_data['user_id'] = $current_user->id;
-            $payment_data['name'] = $current_user->name;
+            $payment_data['payer'] = $current_user->id;
+            $payment_data['payee'] = $request->payee_id;
+            $payment_data['name'] = $inserted_data->name_on_card;
             $payment_data['amount'] = $request->amount;
             $payment_data['payment_date'] = date("Y/m/d");
-            $payment_data['payment_method'] = $request->payment_method;
+            $payment_data['payment_method'] = $current_user->payment_method;
             $payment_data['stripe_reference_number'] = $data->id;
-            $payment_data['artist_id'] = $request->artist_id;
+            $payment_data['card_detail_id'] = $inserted_data->id;
           
 
             Payment::create($payment_data);

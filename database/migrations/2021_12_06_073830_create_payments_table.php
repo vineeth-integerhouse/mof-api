@@ -15,14 +15,19 @@ class CreatePaymentsTable extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+
+            $table->bigInteger('payer')->unsigned();
+            $table->bigInteger('payee')->unsigned();
+         
+            $table->bigInteger('card_detail_id')->unsigned();
+            $table->foreign('card_detail_id')->references('id')->on('card_details')->onDelete('cascade');
+
             $table->string('name')->nullable();
             $table->date('payment_date')->nullable();
             $table->decimal('amount')->nullable();
             $table->string('status')->nullable();
             $table->string('payment_method')->nullable();
             $table->string('stripe_reference_number')->nullable();
-            $table->bigInteger('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
 
             $table->softDeletes();
             $table->timestamps();
