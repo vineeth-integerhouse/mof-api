@@ -76,7 +76,7 @@ class AdminController extends Controller
                 if (isset($request->email)) {
                     $update['email'] = $request->email;
                 }
-                if (isset($request->email)) {
+                if (isset($request->password)) {
                     $update['password'] =  bcrypt($request->password);
                 }
 
