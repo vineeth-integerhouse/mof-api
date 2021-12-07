@@ -399,6 +399,8 @@ class ArtistController extends Controller
         $message =  __('user.not_artist');
         $status_code = BADREQUEST;
   
+        $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+
         $data= User::withTrashed()->select(
             'id',
             'email',
@@ -406,7 +408,7 @@ class ArtistController extends Controller
             'username',
             'profile_pic',
             'deleted_at',
-        )->where('id', $artist_id)->get()->first();
+        )->where('id', $artist_id)->where('role_id', $role)->get()->first();
 
         ActivityLog::updateOrCreate(
             ['artist_id'=> $artist_id,
