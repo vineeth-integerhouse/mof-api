@@ -81,41 +81,26 @@ class AdminController extends Controller
                 }
 
                 $update['updated_at'] = date("Y-m-d H:i:s");
-
-                if ($user_data->role_id==1) {
+                $role =$user_data->role_id;
+                if ($role==1 || $role==2) {
                     if (count($update) != 0) {
-                        DB::table('users')->where('id', $admin_id)->update($update);
+                        DB::table('users')->where('users.id', $admin_id)->update($update);
                     }
                     $data= User::select(
                         'users.id',
-                        'role_id',
                         'name',
                         'email',
-                        'role_name AS role_name',
+                        'role_id',
+                        'role_name',
                         )->leftJoin('roles', 'users.role_id', '=', 'roles.id'
                     )->where('users.id', $admin_id)->get()->first();
                     $message = __('user.update_success');
                     $status_code = SUCCESSCODE;
                 } else {
-                    if ($user_data->role_id==2) {
-                        if (count($update) != 0) {
-                            DB::table('users')->where('id', $admin_id)->update($update);
-                        }
-                        $data= User::select(
-                            'id',
-                            'role_id',
-                            'name',
-                            'email',
-                            'role_name AS role_name',
-                        )->leftJoin('roles', 'users.role_id', '=', 'roles.id'
-                        )->where('users.id', $admin_id)->get()->first();
-                        $message = __('user.update_success');
-                        $status_code = SUCCESSCODE;
-                    } else {
                         $message = __('user.admin_failed');
                         $status_code = BADREQUEST;
-                    }
                 }
+                
             } catch (Exception $e) {
                 $data=[];
                 $message = __('user.update_failed') . ' ' . $e->getMessage();
