@@ -96,9 +96,9 @@ class PaymentController extends Controller
             'payment_date',
             'status',
             'payment_method',
-            'user_id',
-            'artist_id',
-        )->where('artist_id', $current_user->id)->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+            'payer',
+            'payee',
+        )->where('payee', $current_user->id)->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
  
         if (isset($payment)) {
             $data = $payment;
@@ -134,8 +134,8 @@ class PaymentController extends Controller
             'amount',
             'stripe_reference_number',
             'status',
-            'user_id',
-            'artist_id',
+            'payer',
+            'payee',
         )->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
   
         if (isset($payment)) {
