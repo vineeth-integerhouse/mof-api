@@ -68,6 +68,10 @@ return [
     'comment_fetch failed'=> 'Failed to fetch comment',
     'comment_delete_success'=>'Comment deleted successfully',
     'comment_delete_failed'=>'Failed to delete comment',
-   
 
+    'promotion' => 'Promotion successfully added',
+    'promotion_failed' => 'Failed to add promotion',
+   
+    'user_subscription'  => 'User subscription success',
+    'user_subscription_failed' => 'Failed to add user subscription',
 ];

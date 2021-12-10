@@ -54,6 +54,8 @@ Route::group([
         Route::post('notification', [NotificationController::class, 'notification_settings']);
         Route::get('notification', [NotificationController::class, 'get']);
 
+        Route::post('subscribe', [SubscriptionController::class, 'user_subscription']);
+
         /* Seeder routes*/
         Route::get('role', [SeedController::class, 'role']);
         Route::get('genre_type', [SeedController::class, 'genre_type']);
@@ -111,6 +113,7 @@ Route::group([
 
         /*******************  Subscription ****************** */
         Route::post('artist/subscription', [SubscriptionController::class, 'add']);
+        Route::post('artist/promotion', [SubscriptionController::class, 'promotion_add']);
         /*******************  Dashboard  ****************** */
         Route::get('artist/dashboard', [DashboardController::class, 'dashboard_statistcs']);
 
