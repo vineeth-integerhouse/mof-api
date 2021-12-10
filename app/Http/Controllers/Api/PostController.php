@@ -22,7 +22,12 @@ class PostController extends Controller
 
         $post_data['post_type_id'] = $request->post_type_id;
         $post_data['when_to_post_id'] = $request->when_to_post_id;
+  
+
         $post_data['who_can_see_post_id'] = $request->who_can_see_post_id;
+        $post_data['date'] = $request->date;
+        $post_data['time'] = date("H:i:s", strtotime($request->time));
+
         $post_data['user_id'] = $current_user->id;
 
         switch ($request->post_type_id) {
@@ -51,6 +56,7 @@ class PostController extends Controller
             $post_data['content'] = $request->content;
             break;
         }
+
       
         $inserted_data = Post::create($post_data);
 
@@ -65,7 +71,9 @@ class PostController extends Controller
             'when_to_post_id',
             'user_id',
             'who_can_see_post_id',
-            'post_type_id'
+            'post_type_id',
+            'date',
+            DB::raw("DATE_FORMAT(posts.time, '%h:%i %p') as time"),
         )->where('id', $inserted_data->id)->get()->first();
         ;
         $status_code = SUCCESSCODE;
@@ -241,18 +249,19 @@ class PostController extends Controller
         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
  
         $post = Post::select(
-             'id',
-             'title',
-             'content',
-             'image',
-             'video',
-             'audio',
-             'live_stream',
-             'when_to_post_id',
-             'user_id',
-             'who_can_see_post_id',
-             'post_type_id',
-         )->orderBy(DB::raw('posts.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+            'id',
+            'title',
+            'content',
+            'image',
+            'video',
+            'audio',
+            'live_stream',
+            'when_to_post_id',
+            'user_id',
+            'who_can_see_post_id',
+            'post_type_id',
+        )->where('when_to_post_id', '!=', '2')
+        ->orderBy(DB::raw('posts.'.$sort_column), $sort_direction)->paginate($limit, $offset);
  
         if (isset($post)) {
             $message = __('user.post_fetch_success');
@@ -264,5 +273,26 @@ class PostController extends Controller
              'message' => $message,
              'status_code' => $status_code
          ], $status_code);
+    }
+
+    public function handle()
+    {
+        $data= Post::where('when_to_post_id', '2')
+       ->where('time', '<', date("H:i:s"))
+       ->orWhere('date', '<', date("Y-m-d"))
+       ->get();
+
+        if (!empty($data)) {
+            $update['when_to_post_id'] = '1';
+            DB::table('posts')->where('time', '<', date("H:i:s"))->orWhere('date', '<', date("Y-m-d"))->update($update);
+            $message = "Post Updated";
+            $status_code = SUCCESSCODE;
+        }
+
+        return response([
+            'data' => [],
+            'message' => $message,
+            'status_code' => $status_code
+        ], $status_code);
     }
 }
