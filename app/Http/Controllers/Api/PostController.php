@@ -260,7 +260,8 @@ class PostController extends Controller
             'user_id',
             'who_can_see_post_id',
             'post_type_id',
-        )->orderBy(DB::raw('posts.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+        )->where('when_to_post_id', '!=', '2')
+        ->orderBy(DB::raw('posts.'.$sort_column), $sort_direction)->paginate($limit, $offset);
  
         if (isset($post)) {
             $message = __('user.post_fetch_success');
@@ -281,11 +282,6 @@ class PostController extends Controller
        ->where('time', '<', date("H:i:s"))
        ->orWhere('date', '<', date("Y-m-d"))
        ->get();
-
-
-       print_r($data);
-
-       die();
 
         if (!empty($data)) {
             $update['when_to_post_id'] = '1';
