@@ -44,6 +44,10 @@ Route::group([
         Route::get('post/{post_id}/comment', [CommentController::class, 'fetch']);
         Route::delete('comment/{comment_id}', [CommentController::class, 'delete']);
 
+
+        /********************** Like ************ */
+        Route::post('like', [CommentController::class, 'add_like']);
+
         /***************** Payment ************* */
         Route::post('payment', [PaymentController::class, 'stripe']);
 
