@@ -277,7 +277,6 @@ class PostController extends Controller
 
     public function handle()
     {
-        print_r(date("H:i:s"));
         $data= Post::where('when_to_post_id', '2')
        ->where('time', '<', date("H:i:s"))
        ->orWhere('date', '<', date("Y-m-d"))
