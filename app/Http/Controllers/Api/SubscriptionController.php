@@ -120,5 +120,38 @@ class SubscriptionController extends Controller
             'status_code' => $status_code,
         ], $status_code);
     }
+    // fetch_user_subscription
 
+    public function fetch_user_subscription(Request $request)
+    {
+        $data = [];
+        $message = __('user.user_subscription_failed');
+        $status_code = BADREQUEST;
+
+        $current_user = get_user();
+        $users= UserSubscription::withTrashed()->select(
+            'user_subscriptions.id',
+            'user_subscriptions.user_id',
+            'subscribe_id as subscription_id',
+            'subscription_type',
+            'subscriptions.price',
+            'subscriptions.user_id as artist_id',
+            'status',
+            'promotion_id',
+            'promotions.starts_at' ,
+            'promotions.expires_at',
+            
+        )->leftJoin('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
+        ->leftJoin('promotions', 'promotions.id', '=', 'user_subscriptions.promotion_id')
+        ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
+        ->where('user_subscriptions.user_id', $current_user->id)->get();
+        $message = __('user.user_subscription');
+        $status_code = SUCCESSCODE;
+        
+        return response([
+            'data' => $users,
+            'message' => $message,
+            'status_code' => $status_code,
+        ], $status_code);
+    }
 }

@@ -55,6 +55,7 @@ Route::group([
         Route::get('notification', [NotificationController::class, 'get']);
 
         Route::post('subscribe', [SubscriptionController::class, 'user_subscription']);
+        Route::get('subscribe', [SubscriptionController::class, 'fetch_user_subscription']);
 
         /* Seeder routes*/
         Route::get('role', [SeedController::class, 'role']);
