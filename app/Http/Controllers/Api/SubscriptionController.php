@@ -91,7 +91,7 @@ class SubscriptionController extends Controller
 
         $current_user = get_user();
         $data['user_id'] = $current_user->id;
-        $data['promotion_id'] = $request->subscribe_id;
+        $data['subscribe_id'] = $request->subscribe_id;
         $data['promotion_id'] = $request->promotion_id ;
         $data['status'] = $request->status;
      $user_data = UserSubscription::updateOrCreate($data);

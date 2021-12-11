@@ -16,5 +16,6 @@ class SubscriptionSeeder extends Seeder
     {
         SubscriptionType::create(['subscription_type'=>'Monthly']);
         SubscriptionType::create(['subscription_type'=>'Weekly']);
+        SubscriptionType::create(['subscription_type'=>'Annual']);
     }
 }
