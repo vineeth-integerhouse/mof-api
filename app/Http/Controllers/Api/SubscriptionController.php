@@ -46,6 +46,35 @@ class SubscriptionController extends Controller
     }
 
 
+    public function delete(Request $request, $subscription_id)
+    {
+        $user_data = [];
+        $data      = [];
+        $message =  __('user.invalid_user');
+        $status_code = BADREQUEST;
+
+        $current_user = get_user();
+
+        $subscription = Subscription::where('id', $subscription_id)->first();
+
+        $subscription_data = Subscription::where('id', $subscription_id)->where('user_id', $current_user->id)->delete();
+       
+        if ($subscription_data === 1) {
+            $data['id']   = $subscription->id;
+            $message = __('user.subscription_delete_success');
+            $status_code = SUCCESSCODE;
+        } else {
+            $message = __('user.subscription_delete_failed');
+            $status_code = BADREQUEST;
+        }
+    
+        return response([
+            'data'        => $data,
+            'message'     => $message,
+            'status_code' => $status_code
+        ], $status_code);
+    }
+
       /* Add Promotion*/
     public function promotion_add(Request $request)
     {
@@ -95,7 +124,7 @@ class SubscriptionController extends Controller
         $data['promotion_id'] = $request->promotion_id ;
         $data['status'] = $request->status;
      $user_data = UserSubscription::updateOrCreate($data);
-        $users= UserSubscription::withTrashed()->select(
+        $users= UserSubscription::select(
             'user_subscriptions.id',
             'user_subscriptions.user_id',
             'subscribe_id as subscription_id',
@@ -136,7 +165,7 @@ class SubscriptionController extends Controller
         $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
 
-        $users= UserSubscription::withTrashed()->select(
+        $users= UserSubscription::select(
             'user_subscriptions.id',
             'user_subscriptions.user_id',
             'subscribe_id as subscription_id',
@@ -167,6 +196,52 @@ class SubscriptionController extends Controller
         ], $status_code);
     }
 
+    public function unsubscribe(Request $request, $subscription_id)
+    {
+        $data = [];
+        $message     =  '';
+        $status_code = '';
+  
+        $subscribe = UserSubscription::find($subscription_id);
+
+        $current_user = get_user();
+     
+        if ($subscribe) {
+            try {
+                $update = [];
+
+                $update['status'] = $request->status;
+                DB::table('user_subscriptions')->where('id', $subscription_id)->update($update);
+                $data= DB::table('user_subscriptions')
+                        ->select(
+                            'user_subscriptions.id as user_subscription_id',
+                            'user_subscriptions.user_id as user',
+                            'status',
+                            'subscriptions.user_id as artist_id',
+                            'users.name as artist_name',
+                            'users.username as artist_username',
+                            'subscription_types.subscription_type as subscription',
+                        )->leftJoin('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
+                        ->leftJoin('users', 'users.id', '=', 'subscriptions.user_id')
+                        ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
+                        ->where('user_subscriptions.id', $subscription_id)
+                        ->where('user_subscriptions.user_id', $current_user->id)->get()->first();
+                $message = __('user.unsubscribe_success');
+                $status_code = SUCCESSCODE;
+            } catch (Exception $e) {
+                $data=[];
+                $message = __('user.unsubscribe_failed') . ' ' . $e->getMessage();
+                $status_code = BADREQUEST;
+            }
+        }
+
+        return response([
+             'data'        => $data,
+             'message'     => $message,
+             'status_code' => $status_code
+         ], $status_code);
+    }
+
 
     //admin fetch active subscriptions
     public function admin_fetch_subscription(Request $request)
@@ -183,7 +258,7 @@ class SubscriptionController extends Controller
         $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
 
-        $users= UserSubscription::withTrashed()->select(
+        $users= UserSubscription::select(
             'user_subscriptions.id',
             'user_subscriptions.user_id',
             'subscribe_id as subscribe_id',
@@ -222,7 +297,7 @@ class SubscriptionController extends Controller
         $message = __('user.admin_subscription_failed');
         $status_code = BADREQUEST;
 
-        $users= UserSubscription::withTrashed()->select(
+        $users= UserSubscription::select(
             'user_subscriptions.id',
             'user_subscriptions.user_id',
             'subscribe_id as subscription_id',

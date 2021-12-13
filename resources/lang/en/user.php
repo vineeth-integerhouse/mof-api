@@ -76,7 +76,11 @@ return [
    
     'user_subscription'  => 'User subscription success',
     'user_subscription_failed' => 'Failed to add user subscription',
+    'subscription_delete_success' => 'Subscription deleted successfully',
+    'subscription_delete_failed' => 'Failed to delete Subscription',
 
     'admin_subscription_failed' => 'Failed to fetch Subscription',
     'admin_subscription' =>    'Subscription fetched successfully',
+    'unsubscribe_success' => 'User Unsubscribed successfully',
+    'unsubscribe_failed' => 'User failed to unsubscribe',
 ];
