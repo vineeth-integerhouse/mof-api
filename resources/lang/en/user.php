@@ -68,6 +68,9 @@ return [
     'comment_fetch failed'=> 'Failed to fetch comment',
     'comment_delete_success'=>'Comment deleted successfully',
     'comment_delete_failed'=>'Failed to delete comment',
+
+    'add_like_failed' => 'Failed to add like',
+    'add_like_success' => 'Like successfully added',
    
 
 ];
