@@ -74,4 +74,7 @@ return [
    
     'user_subscription'  => 'User subscription success',
     'user_subscription_failed' => 'Failed to add user subscription',
+
+    'admin_subscription_failed' => 'Failed to fetch Subscription',
+    'admin_subscription' =>    'Subscription fetched successfully',
 ];

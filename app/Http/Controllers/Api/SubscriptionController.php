@@ -143,8 +143,8 @@ class SubscriptionController extends Controller
             'subscription_type as subscription',
             'subscriptions.price',
             'subscriptions.user_id as artist_id',
-            'users.name',
-            'users.username',
+            'users.name as artist_name',
+            'users.username as artist_username',
             'status',
             'promotion_id',
             'promotions.starts_at' ,
@@ -168,10 +168,11 @@ class SubscriptionController extends Controller
     }
 
 
-public function admin_fetch_subscription(Request $request)
+    //admin fetch active subscriptions
+    public function admin_fetch_subscription(Request $request)
     {
         $data = [];
-        $message = __('user.user_subscription_failed');
+        $message = __('user.admin_subscription_failed');
         $status_code = BADREQUEST;
 
         $current_user = get_user();
@@ -181,6 +182,45 @@ public function admin_fetch_subscription(Request $request)
  
         $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+
+        $users= UserSubscription::withTrashed()->select(
+            'user_subscriptions.id',
+            'user_subscriptions.user_id',
+            'subscribe_id as subscribe_id',
+            'subscription_type as subscription',
+            'subscriptions.price',
+            'subscriptions.user_id as artist_id',
+            'users.name as artist_name',
+            'users.username as artist_username',
+            'status',
+            'promotion_id',
+            'promotions.starts_at' ,
+            'promotions.expires_at',
+            
+        )->leftJoin('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
+        ->leftJoin('promotions', 'promotions.id', '=', 'user_subscriptions.promotion_id')
+        ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
+        ->leftJoin('users', 'users.id', '=', 'subscriptions.user_id')
+        ->where('subscriptions.deleted_at', null)
+        ->where('user_subscriptions.status', 1)
+        ->orderBy(DB::raw('user_subscriptions.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+        
+        $message = __('user.admin_subscription');
+        $status_code = SUCCESSCODE;
+        
+        return response([
+            'data' => $users,
+            'message' => $message,
+            'status_code' => $status_code,
+        ], $status_code);
+    }
+
+     
+    public function admin_fetch_subscription_details(Request $request, $subscription_id)
+    {
+        $data = [];
+        $message = __('user.admin_subscription_failed');
+        $status_code = BADREQUEST;
 
         $users= UserSubscription::withTrashed()->select(
             'user_subscriptions.id',
@@ -200,9 +240,10 @@ public function admin_fetch_subscription(Request $request)
         ->leftJoin('promotions', 'promotions.id', '=', 'user_subscriptions.promotion_id')
         ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
         ->leftJoin('users', 'users.id', '=', 'subscriptions.user_id')
-        ->where('subscriptions.deleted_at', null)
-        ->orderBy(DB::raw('user_subscriptions.'.$sort_column), $sort_direction)->paginate($limit, $offset);
-        $message = __('user.user_subscription');
+        ->where('user_subscriptions.deleted_at', null)
+        ->where('user_subscriptions.id', $subscription_id)->get()->first();
+
+        $message = __('user.admin_subscription');
         $status_code = SUCCESSCODE;
         
         return response([
@@ -211,4 +252,5 @@ public function admin_fetch_subscription(Request $request)
             'status_code' => $status_code,
         ], $status_code);
     }
+    
 }
