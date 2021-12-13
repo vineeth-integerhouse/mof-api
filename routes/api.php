@@ -148,6 +148,8 @@ Route::group([
 
         /********************* Payout ************** */
         Route::get('admin/payment', [PaymentController::class, 'payment_list']);
+
+        Route::get('admin/subscribe', [SubscriptionController::class, 'admin_fetch_subscription']);
     });
 });
 
