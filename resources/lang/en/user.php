@@ -71,6 +71,8 @@ return [
 
     'promotion' => 'Promotion successfully added',
     'promotion_failed' => 'Failed to add promotion',
+    'add_like_failed' => 'Failed to add like',
+    'add_like_success' => 'Like successfully added',
    
     'user_subscription'  => 'User subscription success',
     'user_subscription_failed' => 'Failed to add user subscription',
