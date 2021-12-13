@@ -185,6 +185,7 @@ class SubscriptionController extends Controller
         ->leftJoin('users', 'users.id', '=', 'subscriptions.user_id')
         ->where('user_subscriptions.user_id', $current_user->id)
         ->where('user_subscriptions.deleted_at', null)
+        ->where('user_subscriptions.status', 1)
         ->orderBy(DB::raw('user_subscriptions.'.$sort_column), $sort_direction)->paginate($limit, $offset);
         $message = __('user.user_subscription');
         $status_code = SUCCESSCODE;
