@@ -49,7 +49,8 @@ class AdminController extends Controller
             $status_code = SUCCESSCODE;
             try {
                 $details = [
-                'email' => $request->email,
+                    'email' => $request->email,
+                    'password' => $request->password,
             ];
                 Mail::to($request->email)->send(new \App\Mail\WelcomeMail($details));
             } catch (\Exception $e) {

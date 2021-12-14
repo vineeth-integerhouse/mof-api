@@ -75,7 +75,7 @@ class SubscriptionController extends Controller
         ], $status_code);
     }
 
-      /* Add Promotion*/
+    /* Add Promotion*/
     public function promotion_add(Request $request)
     {
         $data = [];
@@ -87,11 +87,12 @@ class SubscriptionController extends Controller
         $promotion_data = Promotion::updateOrCreate(
             ['user_id' => $current_user->id
     ],
-     [
+            [
          'starts_at' => $request->starts_at,
          'expires_at' => $request->expires_at,
          'price' => $request->price,
-     ]);
+     ]
+        );
 
         $users= Promotion::select(
             'id',
@@ -119,11 +120,16 @@ class SubscriptionController extends Controller
         $status_code = BADREQUEST;
 
         $current_user = get_user();
-        $data['user_id'] = $current_user->id;
-        $data['subscribe_id'] = $request->subscribe_id;
-        $data['promotion_id'] = $request->promotion_id ;
-        $data['status'] = $request->status;
-     $user_data = UserSubscription::updateOrCreate($data);
+
+        $user_data=  UserSubscription::updateOrCreate(
+            ['subscribe_id' => $request->subscribe_id,
+       ],
+            [
+            'user_id' => $current_user->id,
+            'promotion_id' => $request->promotion_id,
+            'status'=> $request->status
+        ]
+        );
         $users= UserSubscription::select(
             'user_subscriptions.id',
             'user_subscriptions.user_id',
@@ -133,9 +139,8 @@ class SubscriptionController extends Controller
             'subscriptions.user_id as artist_id',
             'status',
             'promotion_id',
-            'promotions.starts_at' ,
+            'promotions.starts_at',
             'promotions.expires_at',
-            
         )->leftJoin('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
         ->leftJoin('promotions', 'promotions.id', '=', 'user_subscriptions.promotion_id')
         ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
@@ -149,9 +154,11 @@ class SubscriptionController extends Controller
             'status_code' => $status_code,
         ], $status_code);
     }
-    // fetch_user_subscription
 
-    public function fetch_user_subscription(Request $request)
+
+    // Lisitng users subscription
+
+    public function list(Request $request)
     {
         $data = [];
         $message = __('user.user_subscription_failed');
@@ -172,14 +179,12 @@ class SubscriptionController extends Controller
             'subscription_type as subscription',
             'subscriptions.price',
             'subscriptions.user_id as artist_id',
-            'users.name as artist_name',
-            'users.username as artist_username',
-            'users.profile_pic as artist_profile_image',
-            'status',
+            'users.name',
+            'users.username',
+            'users.profile_pic',
             'promotion_id',
-            'promotions.starts_at' ,
+            'promotions.starts_at',
             'promotions.expires_at',
-            
         )->leftJoin('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
         ->leftJoin('promotions', 'promotions.id', '=', 'user_subscriptions.promotion_id')
         ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
@@ -246,7 +251,7 @@ class SubscriptionController extends Controller
 
 
     //admin fetch active subscriptions
-    public function admin_fetch_subscription(Request $request)
+    public function admin_list(Request $request)
     {
         $data = [];
         $message = __('user.admin_subscription_failed');
@@ -272,9 +277,8 @@ class SubscriptionController extends Controller
             'subscriptions.user_id as artist_id',
             'status',
             'promotion_id',
-            'promotions.starts_at' ,
+            'promotions.starts_at',
             'promotions.expires_at',
-            
         )->leftJoin('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
         ->leftJoin('promotions', 'promotions.id', '=', 'user_subscriptions.promotion_id')
         ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
@@ -294,7 +298,7 @@ class SubscriptionController extends Controller
     }
 
      
-    public function admin_fetch_subscription_details(Request $request, $subscription_id)
+    public function admin_fetch(Request $request, $subscription_id)
     {
         $data = [];
         $message = __('user.admin_subscription_failed');
@@ -307,13 +311,11 @@ class SubscriptionController extends Controller
             'subscription_type as subscription',
             'subscriptions.price',
             'subscriptions.user_id as artist_id',
-            'users.name as artist_name',
-            'users.username as artist_username',
-            'status',
+            'users.name',
+            'users.username',
             'promotion_id',
-            'promotions.starts_at' ,
+            'promotions.starts_at',
             'promotions.expires_at',
-            
         )->leftJoin('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
         ->leftJoin('promotions', 'promotions.id', '=', 'user_subscriptions.promotion_id')
         ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
@@ -330,5 +332,4 @@ class SubscriptionController extends Controller
             'status_code' => $status_code,
         ], $status_code);
     }
-    
 }
