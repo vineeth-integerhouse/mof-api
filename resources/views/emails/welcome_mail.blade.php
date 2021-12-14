@@ -104,7 +104,9 @@
         <h2 class="text-align-center"> Hello !</h2>
          <h3>
          <h3> Welcome to Music Only Fans!<h3>
-<h3>Your account has been created. </h3>
+<h3>Your account has been created. Please login with below credentials </h3>
+         <p> Email  - {{ $details['email'] }}</p>
+         <p> Password  - {{ $details['password'] }} </p>
 <h3>Sincerley</h3>
 <h3> Music Only Fans!</h3>
 </div>

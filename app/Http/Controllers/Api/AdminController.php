@@ -200,6 +200,8 @@ class AdminController extends Controller
                     if (isset($request->name)) {
                         $update['name'] = $request->name;
                     }
+
+                    $update['profile_pic'] = $request->profile_pic;
                
                     $update['updated_at'] = date("Y-m-d H:i:s");
                     if (count($update) != 0) {

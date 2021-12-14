@@ -50,6 +50,7 @@ Route::group([
 
         /***************** Payment ************* */
         Route::post('payment', [PaymentController::class, 'stripe']);
+        Route::put('payment', [PaymentController::class, 'update']);
 
         /***************** Upload ************* */
         Route::post('upload', [UploadController::class, 'upload']);
@@ -148,6 +149,7 @@ Route::group([
 
         /********************* Payout ************** */
         Route::get('admin/payment', [PaymentController::class, 'payment_list']);
+        Route::get('admin/payout', [PaymentController::class, 'payout_list']);
     });
 });
 

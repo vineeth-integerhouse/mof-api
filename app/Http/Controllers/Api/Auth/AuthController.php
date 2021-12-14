@@ -52,6 +52,7 @@ class AuthController extends Controller
             try {
                 $details = [
                 'email' => $request->email,
+                'password' => $request->password,
             ];
                 Mail::to($request->email)->send(new \App\Mail\WelcomeMail($details));
             } catch (\Exception $e) {
