@@ -22,13 +22,13 @@ return [
     'not_artist'=>'Not a Artist',
 
     'email_in_use' => 'Email already in use',
-    'password_not_match' => 'The password confirmation does not match.', 
+    'password_not_match' => 'The password confirmation does not match.',
     'user_settings' => 'Profile Settings',
     'wrong_password' => 'Current password is incorrect',
     'user_settings_failed' => 'Failed to save the settings',
     'password'=> 'New Password Updated',
     'email'=> 'New Email Updated',
-    'email_not_match' => 'The email confirmation does not match.', 
+    'email_not_match' => 'The email confirmation does not match.',
     'wrong_email' => 'Current email is incorrect',
 
     'setup_success'=> 'Setup profile sucess',
@@ -51,6 +51,7 @@ return [
     'payment' => 'Payment Success',
     'fetch_payment failed' => 'Failed to fetch payments',
     'fetch_payment_success' => 'Payments details fetched successfully',
+    'payment_status'=>'Status successfully updated',
 
     'subscription' => 'Subscription successfully added',
     'subscription_failed' => 'Failed to add subscription',

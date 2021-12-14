@@ -9,5 +9,5 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Payment extends Model
 {
     use HasFactory, SoftDeletes;
-    public $fillable = ['name', 'payment_date', 'amount', 'status', 'payment_method', 'stripe_reference_number', 'payer','payee','card_detail_id'];
+    public $fillable = ['name', 'payment_date', 'amount', 'status','payin_payout', 'payment_method', 'stripe_reference_number', 'payer','payee','card_detail_id'];
 }

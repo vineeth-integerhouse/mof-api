@@ -66,7 +66,8 @@ class User extends Authenticatable
         $users = User::select(
             'name',
             'email',
-            DB::raw('role_name AS role'),
+            'role_id',
+            'role_name',
             DB::raw('users.id AS id'),
         )->leftJoin('roles', 'users.role_id', '=', 'roles.id')
            ->whereHas('role', function (Builder $query) use ($user_role) {
@@ -99,8 +100,6 @@ class User extends Authenticatable
         $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
  
- 
-
         $users = User::select(
             'name',
             'username',
@@ -136,6 +135,7 @@ class User extends Authenticatable
         $users = User::select(
             'name',
             'email',
+            'username',
             'id',
             'profile_pic',
         )->where('id', '!=', $current_user->id)
