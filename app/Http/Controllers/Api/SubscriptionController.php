@@ -174,6 +174,7 @@ class SubscriptionController extends Controller
             'subscriptions.user_id as artist_id',
             'users.name as artist_name',
             'users.username as artist_username',
+            'users.profile_pic as artist_profile_image',
             'status',
             'promotion_id',
             'promotions.starts_at' ,
@@ -262,12 +263,13 @@ class SubscriptionController extends Controller
         $users= UserSubscription::select(
             'user_subscriptions.id',
             'user_subscriptions.user_id',
+            'users.name',
+            'users.username as username',
+            'users.profile_pic',
             'subscribe_id as subscribe_id',
             'subscription_type as subscription',
             'subscriptions.price',
             'subscriptions.user_id as artist_id',
-            'users.name as artist_name',
-            'users.username as artist_username',
             'status',
             'promotion_id',
             'promotions.starts_at' ,
@@ -276,7 +278,7 @@ class SubscriptionController extends Controller
         )->leftJoin('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
         ->leftJoin('promotions', 'promotions.id', '=', 'user_subscriptions.promotion_id')
         ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
-        ->leftJoin('users', 'users.id', '=', 'subscriptions.user_id')
+        ->leftJoin('users', 'users.id', '=', 'user_subscriptions.user_id')
         ->where('subscriptions.deleted_at', null)
         ->where('user_subscriptions.status', 1)
         ->orderBy(DB::raw('user_subscriptions.'.$sort_column), $sort_direction)->paginate($limit, $offset);
