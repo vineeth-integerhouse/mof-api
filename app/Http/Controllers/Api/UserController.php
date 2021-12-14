@@ -7,12 +7,67 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Rules\StrongPassword;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
+
+     //Add new user
+     public function add(Request $request)
+     {
+         $data = [];
+         $users=[];
+         $message = __('user.user_add_failed');
+         $status_code = BADREQUEST;
+ 
+         $validate_data = Validator::make($request->all(), [
+             'email' => 'email|required|unique:users',
+             'password' => [new StrongPassword],
+         ]);
+ 
+         if ($validate_data->fails()) {
+             $errors = $validate_data->errors();
+             $message =  implode(', ', $errors->all());
+         } else {
+             $data['role_id'] = Role::where('role_name', USER_ROLE_USER)->first()->id;
+             $data['name'] = $request->name;
+             $data['username'] = $request->name;
+             $data['email'] = $request->email;
+             $data['password'] = bcrypt($request->password);
+           
+             $inserted_data = User::create($data);
+ 
+             $users= User::select(
+                 'id',
+                 'role_id',
+                 'name',
+                 'username',
+                 'email',
+             )->where('id', $inserted_data->id)->get()->first();
+             $message = __('user.user_add_success');
+             $status_code = SUCCESSCODE;
+             try {
+                 $details = [
+                 'email' => $request->email,
+             ];
+                 Mail::to($request->email)->send(new \App\Mail\WelcomeMail($details));
+             } catch (\Exception $e) {
+                 $message = "Invalid email given for new user";
+             }
+         }
+         
+         return response([
+             'data' => $users,
+             'message' => $message,
+             'status_code' => $status_code,
+         ], $status_code);
+     }
+     
     /*Account Setup*/
 
     public function set_up_account(Request $request)

@@ -144,11 +144,13 @@ Route::group([
         Route::get('admin/logout', [AuthController::class, 'logout']);
         
         /********************** Manage User ************ */
+        Route::post('admin/user', [UserController::class, 'add']);
         Route::get('admin/user', [UserController::class, 'list']);
         Route::delete('admin/user/{user_id}', [UserController::class, 'delete']);
         Route::put('admin/user/{user_id}', [UserController::class, 'update']);
 
         /********************** Manage Artist ************ */
+        Route::post('admin/artist', [ArtistController::class, 'add']);
         Route::get('admin/artist', [ArtistController::class, 'list']);
         Route::delete('admin/artist/{artist_id}', [ArtistController::class, 'admin_delete']);
         Route::put('admin/artist/{artist_id}', [ArtistController::class, 'update']);
