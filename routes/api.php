@@ -59,6 +59,11 @@ Route::group([
         Route::post('notification', [NotificationController::class, 'notification_settings']);
         Route::get('notification', [NotificationController::class, 'get']);
 
+          /********************* subscription ************** */
+        Route::post('subscribe', [SubscriptionController::class, 'user_subscription']);
+        Route::put('unsubscribe/{subscribe_id}', [SubscriptionController::class, 'unsubscribe']);
+        Route::get('subscribe', [SubscriptionController::class, 'fetch_user_subscription']);
+
         /* Seeder routes*/
         Route::get('role', [SeedController::class, 'role']);
         Route::get('genre_type', [SeedController::class, 'genre_type']);
@@ -116,6 +121,10 @@ Route::group([
 
         /*******************  Subscription ****************** */
         Route::post('artist/subscription', [SubscriptionController::class, 'add']);
+        Route::delete('artist/subscription/{subscription_id}', [SubscriptionController::class, 'delete']);
+
+
+        Route::post('artist/promotion', [SubscriptionController::class, 'promotion_add']);
         /*******************  Dashboard  ****************** */
         Route::get('artist/dashboard', [DashboardController::class, 'dashboard_statistcs']);
 
@@ -149,6 +158,10 @@ Route::group([
 
         /********************* Payout ************** */
         Route::get('admin/payment', [PaymentController::class, 'payment_list']);
+
+         /********************* subscription ************** */
+        Route::get('admin/subscription', [SubscriptionController::class, 'admin_fetch_subscription']);
+        Route::get('admin/subscription/{subscription_id}', [SubscriptionController::class, 'admin_fetch_subscription_details']);
         Route::get('admin/payout', [PaymentController::class, 'payout_list']);
     });
 });
