@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
 
 class AdminController extends Controller
 {
@@ -46,6 +47,14 @@ class AdminController extends Controller
             )->where('id', $inserted_data->id)->get()->first();
             $message = __('user.admin_add_success');
             $status_code = SUCCESSCODE;
+            try {
+                $details = [
+                'email' => $request->email,
+            ];
+                Mail::to($request->email)->send(new \App\Mail\WelcomeMail($details));
+            } catch (\Exception $e) {
+                $message = "Invalid email given for new user";
+            }
         }
         
         return response([
