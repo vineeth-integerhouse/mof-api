@@ -71,6 +71,8 @@ return [
 
     'add_like_failed' => 'Failed to add like',
     'add_like_success' => 'Like successfully added',
+    'user_add_success' => 'New member has been successfully added',
+    'user_add_failed' => 'Failed to create a new member',
    
 
 ];
