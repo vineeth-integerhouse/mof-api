@@ -139,7 +139,7 @@ class ArtistController extends Controller
                     $update['email'] = $request->email;
                 }
                  
-                $update['profile_pic'] = $request->photo;
+                $update['profile_pic'] = $request->profile_pic;
    
                 $update['updated_at'] = date("Y-m-d H:i:s");
    

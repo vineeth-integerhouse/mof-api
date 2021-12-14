@@ -29,6 +29,7 @@ class PaymentController extends Controller
             'stripe_token' => 'required',
             'currency' => 'required',
             'payee_id' => 'required',
+            'payin_payout'=> 'required',
         ]);
 
         if ($validate_data->fails()) {
@@ -38,7 +39,7 @@ class PaymentController extends Controller
         } else {
             $current_user = get_user();
             Stripe::setApiKey(config('stripe.stripe_secret'));
-            $data = Customer::create([
+            $stripe_data = Customer::create([
                 "source" => $request->stripe_token,
             ]);
             
@@ -59,17 +60,41 @@ class PaymentController extends Controller
             $payment_data['amount'] = $request->amount;
             $payment_data['payment_date'] = date("Y/m/d");
             $payment_data['payment_method'] = $current_user->payment_method;
-            $payment_data['stripe_reference_number'] = $data->id;
+            $payment_data['stripe_reference_number'] = $stripe_data->id;
             $payment_data['card_detail_id'] = $inserted_data->id;
+            $payment_data['payin_payout'] =  $request->payin_payout;
           
 
-            Payment::create($payment_data);
+          $payment_inserted_data=  Payment::create($payment_data);
+            $data['Payment']=Payment::select(
+                'id',
+                'payer',
+                'payee',
+                'card_detail_id' ,
+                'name',
+                'payment_date',
+                'amount',
+                'stripe_reference_number',
+                'status',
+                'payin_payout'
+            )->where('id',$payment_inserted_data->id)->get()->first();
+
+            $data['Card Details']=CardDetail::select(
+                'id',
+                'user_id',
+                'name_on_card',
+                'credit_card_number',
+                'country_region',
+                'zip_code',
+            )->where('id',$inserted_data->id)->get()->first();
+
             $status_code = SUCCESSCODE;
             $message = __('user.payment');
         }
 
         return response([
             'data' => $data,
+            'stripe'=>$stripe_data,
             'message' => $message,
             'status_code' => $status_code
         ]);
@@ -128,19 +153,27 @@ class PaymentController extends Controller
         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
   
         $payment = Payment::select(
-            'id',
-            'name',
+            'payments.id',
+            'payments.name',
             'payment_date',
             'amount',
             'stripe_reference_number',
             'status',
             'payer',
             'payee',
-        )->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+            'profile_pic',
+            'payin_payout'
+        )->leftJoin('users', 'users.id', '=', 'payments.payer')
+        ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
+        ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
   
         if (isset($payment)) {
             $data = $payment;
-            $data['Total Revenue'] = Payment::select('amount')->get()->sum('amount');
+            $data['Total Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->get()->sum('amount');
+
+            $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->get()->sum('amount');
+            $data['Total Profit'] =  $data['Total Revenue'] - $total_payout;
+
             $message = __('user.fetch_payment_success');
             $status_code = SUCCESSCODE;
         }
@@ -149,5 +182,90 @@ class PaymentController extends Controller
               'message' => $message,
               'status_code' => $status_code
           ], $status_code);
+    }
+
+     /*Admin List Payouts */
+     public function payout_list(Request $request)
+     {
+         $data = [];
+         $message = __('user.fetch_payment failed');
+         $status_code = BADREQUEST;
+   
+         $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
+         $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
+         $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
+   
+         $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
+         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+   
+         $payment = Payment::select(
+             'payments.id',
+             'payments.name',
+             'payment_date',
+             'amount',
+             'stripe_reference_number',
+             'status',
+             'payer',
+             'payee',
+             'profile_pic',
+             'payin_payout'
+         )->leftJoin('users', 'users.id', '=', 'payments.payer')
+         ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
+         ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+   
+         if (isset($payment)) {
+             $data = $payment;
+             $data['Total Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->get()->sum('amount');
+
+             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->get()->sum('amount');
+             $data['Total Profit'] =  $data['Total Revenue'] - $total_payout;
+             $message = __('user.fetch_payment_success');
+             $status_code = SUCCESSCODE;
+         }
+         return response([
+               'data' => $data,
+               'message' => $message,
+               'status_code' => $status_code
+           ], $status_code);
+     }
+ 
+
+    public function update(Request $request)
+    {
+        $data=[];
+        $current_user = get_user();
+
+        $validate_data = Validator::make($request->all(), [
+            'status' => 'required',
+        ]);
+        
+        if ($validate_data->fails()) {
+            $errors = $validate_data->errors();
+            $message =  implode(', ', $errors->all());
+            $status_code = BADREQUEST;
+        } else {
+            if ($current_user) {
+                try {
+                    DB::table('payments')->where('payer', $current_user->id)->update([
+                        'status' => $request->status ?? $current_user->status
+                    ]);
+                } catch (\Illuminate\Database\QueryException  $e) {
+                    $message = __('user.payment_status') + $e;
+                    $status_code = BADREQUEST;
+                }
+            }
+            $data = Payment::where('payer', $current_user->id)->first();
+
+            $message = __('user.payment_status');
+            $status_code = SUCCESSCODE;
+        }
+
+        return response([
+            'data' => $data,
+            'message' => $message,
+            'status_code' => $status_code,
+        ]);
+    
+
     }
 }

@@ -25,9 +25,11 @@ class CreatePaymentsTable extends Migration
             $table->string('name')->nullable();
             $table->date('payment_date')->nullable();
             $table->decimal('amount')->nullable();
-            $table->string('status')->nullable();
             $table->string('payment_method')->nullable();
             $table->string('stripe_reference_number')->nullable();
+
+            $table->enum('status', ['Error', 'On Hold', 'Pending', 'Paid'])->nullable();
+            $table->enum('payin_payout', ['Payin', 'Payouts'])->nullable();
 
             $table->softDeletes();
             $table->timestamps();

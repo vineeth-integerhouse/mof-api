@@ -27,8 +27,11 @@ class DashboardController extends Controller
 
         $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER);
         $widget_data['Registered Artists']  =  User::artists_count(USER_ROLE_ARTIST);
-        $widget_data['Total Gross Revenue'] = Payment::select('amount')->get()->sum('amount');
-        $widget_data['Total Gross Profits'] = 0;
+        $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->get()->sum('amount');
+
+        $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->get()->sum('amount');
+        $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+
 
         $widget_data['current_user'] = User::select(
             'id',
