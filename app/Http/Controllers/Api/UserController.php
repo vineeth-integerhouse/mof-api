@@ -225,29 +225,29 @@ class UserController extends Controller
     /* fetch User */
     public function admin_fetch(Request $request, $user_id)
     {
-        $users = [];
-        $message =  __('user.user_list_failed');
+        $user_data = [];
+        $data      = [];
+        $message = __('user.not_user');
         $status_code = BADREQUEST;
-  
-        $users = User::select(
+
+        $role= Role::where('role_name', USER_ROLE_USER)->first()->id;
+        $data= User::withTrashed()->select(
             'id',
             'email',
             'name',
             'username',
             'profile_pic',
-            'role_id'
-        )->with('role', function ($query) {
-            $query->select('id', 'role_name');
-        })->where('id', $user_id)->get();
-        
-        $message = __('user.user_list_success');
-        $status_code = SUCCESSCODE;
- 
+            'deleted_at',
+        )->where('id', $user_id)->where('role_id', $role)->first();
+        if (isset($data)) {
+            $message = __('user.user_list_success');
+            $status_code = SUCCESSCODE;
+        }
+    
         return response([
-             'data'        => $users,
-             'message'     => $message,
-             'status_code' => $status_code
-         ], $status_code);
+            'data'        => $data,
+            'message'     => $message,
+            'status_code' => $status_code
+        ], $status_code);
     }
-
 }

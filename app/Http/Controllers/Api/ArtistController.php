@@ -491,29 +491,29 @@ class ArtistController extends Controller
      /* fetch Artist */
      public function admin_fetch(Request $request, $artist_id)
      {
-         $users = [];
-         $message =  __('user.user_list_failed');
-         $status_code = BADREQUEST;
-   
-         $users = User::select(
-             'id',
-             'email',
-             'name',
-             'username',
-             'profile_pic',
-             'role_id'
-         )->with('role', function ($query) {
-             $query->select('id', 'role_name');
-         })->where('id', $artist_id)->get();
-         
-         $message = __('user.user_list_success');
-         $status_code = SUCCESSCODE;
+        $message =  __('user.not_artist');
+        $status_code = BADREQUEST;
   
-         return response([
-              'data'        => $users,
+        $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+
+        $data= User::withTrashed()->select(
+            'id',
+            'email',
+            'name',
+            'username',
+            'profile_pic',
+            'deleted_at',
+        )->where('id', $artist_id)->where('role_id', $role)->first();
+
+        if (isset($data)) {
+            $message = __('user.user_list_success');
+            $status_code = SUCCESSCODE;
+        }
+  
+        return response([
+              'data'        => $data,
               'message'     => $message,
               'status_code' => $status_code
           ], $status_code);
-     }
-
+    }
 }
