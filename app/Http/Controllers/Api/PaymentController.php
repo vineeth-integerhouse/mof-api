@@ -127,12 +127,13 @@ class PaymentController extends Controller
  
         if (isset($payment)) {
             $data = $payment;
-            $data['Total Revenue'] = Payment::select('amount')->get()->sum('amount');
+            $payment_data['Total Revenue'] = Payment::select('amount')->get()->sum('amount');
             $message = __('user.fetch_payment_success');
             $status_code = SUCCESSCODE;
         }
         return response([
              'data' => $data,
+             'payment_data' => $payment_data,
              'message' => $message,
              'status_code' => $status_code
          ], $status_code);
