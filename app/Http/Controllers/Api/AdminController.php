@@ -256,29 +256,33 @@ class AdminController extends Controller
     /* fetch Admin */
     public function fetch(Request $request, $admin_id)
     {
-        $users = [];
-        $message =  __('user.user_list_failed');
+        $user_data = [];
+        $data      = [];
+        $message =  __('user.admin_failed');
         $status_code = BADREQUEST;
-  
-        $users = User::select(
-            'id',
+
+        $user_data =User:: withTrashed()->select(
             'email',
             'name',
             'username',
             'profile_pic',
-            'role_id',
-        )->with('role', function ($query) {
-            $query->select('id', 'role_name');
-        })->where('id', $admin_id)->get();
-        
-        $message = __('user.user_list_success');
-        $status_code = SUCCESSCODE;
- 
+            'users.deleted_at',
+            DB::raw('role_name AS role'),
+            DB::raw('users.id AS id'),
+        )->leftJoin('roles', 'users.role_id', '=', 'roles.id')
+         ->where('role_name', '!=', 'User')
+         ->where('role_name', '!=', 'Artist')
+         ->where(DB::raw('users.id'), '=', $admin_id)->first();
+         if (isset($user_data)) {
+            $message = __('user.user_list_success');
+            $status_code = SUCCESSCODE;
+        }
+
         return response([
-             'data'        => $users,
-             'message'     => $message,
-             'status_code' => $status_code
-         ], $status_code);
+            'data'        => $user_data,
+            'message'     => $message,
+            'status_code' => $status_code
+        ], $status_code);
     }
 
 }

@@ -146,7 +146,7 @@ Route::group([
         /********************** Manage User ************ */
         Route::post('admin/user', [UserController::class, 'add']);
         Route::get('admin/user', [UserController::class, 'list']);
-        Route::get('admin/user/{user_id}', [ArtistController::class, 'admin_fetch']);
+        Route::get('admin/user/{user_id}', [UserController::class, 'admin_fetch']);
         Route::delete('admin/user/{user_id}', [UserController::class, 'delete']);
         Route::put('admin/user/{user_id}', [UserController::class, 'update']);
 
