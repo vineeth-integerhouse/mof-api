@@ -146,12 +146,14 @@ Route::group([
         /********************** Manage User ************ */
         Route::post('admin/user', [UserController::class, 'add']);
         Route::get('admin/user', [UserController::class, 'list']);
+        Route::get('admin/user/{user_id}', [ArtistController::class, 'fetchOne']);
         Route::delete('admin/user/{user_id}', [UserController::class, 'delete']);
         Route::put('admin/user/{user_id}', [UserController::class, 'update']);
 
         /********************** Manage Artist ************ */
         Route::post('admin/artist', [ArtistController::class, 'add']);
         Route::get('admin/artist', [ArtistController::class, 'list']);
+        Route::get('admin/artist/{artist_id}', [ArtistController::class, 'fetchOne']);
         Route::delete('admin/artist/{artist_id}', [ArtistController::class, 'admin_delete']);
         Route::put('admin/artist/{artist_id}', [ArtistController::class, 'update']);
 
@@ -181,6 +183,7 @@ Route::group([
         Route::delete('admin/{admin_id}', [AdminController::class, 'delete']);
         Route::put('admin/{admin_id}', [AdminController::class, 'update']);
         Route::get('admin', [AdminController::class, 'list']);
+        Route::get('admin/{admin_id}', [AdminController::class, 'fetchOne']);
 
         /*********************** Statictics******************** */
         Route::get('admin/statistcs', [DashboardController::class, 'admin_statistcs']);
