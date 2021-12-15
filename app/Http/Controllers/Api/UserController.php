@@ -223,7 +223,7 @@ class UserController extends Controller
     }
 
     /* fetch User */
-    public function fetchOne(Request $request, $user_id)
+    public function admin_fetch(Request $request, $user_id)
     {
         $users = [];
         $message =  __('user.user_list_failed');
@@ -233,6 +233,8 @@ class UserController extends Controller
             'id',
             'email',
             'name',
+            'username',
+            'profile_pic',
             'role_id'
         )->with('role', function ($query) {
             $query->select('id', 'role_name');

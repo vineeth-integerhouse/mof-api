@@ -254,7 +254,7 @@ class AdminController extends Controller
     }
     
     /* fetch Admin */
-    public function fetchOne(Request $request, $admin_id)
+    public function fetch(Request $request, $admin_id)
     {
         $users = [];
         $message =  __('user.user_list_failed');
@@ -264,6 +264,8 @@ class AdminController extends Controller
             'id',
             'email',
             'name',
+            'username',
+            'profile_pic',
             'role_id',
         )->with('role', function ($query) {
             $query->select('id', 'role_name');

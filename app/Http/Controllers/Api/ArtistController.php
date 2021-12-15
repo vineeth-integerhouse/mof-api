@@ -489,7 +489,7 @@ class ArtistController extends Controller
     }
 
      /* fetch Artist */
-     public function fetchOne(Request $request, $artist_id)
+     public function admin_fetch(Request $request, $artist_id)
      {
          $users = [];
          $message =  __('user.user_list_failed');
@@ -499,6 +499,8 @@ class ArtistController extends Controller
              'id',
              'email',
              'name',
+             'username',
+             'profile_pic',
              'role_id'
          )->with('role', function ($query) {
              $query->select('id', 'role_name');
