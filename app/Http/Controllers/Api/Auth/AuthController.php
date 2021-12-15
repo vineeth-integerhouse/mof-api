@@ -89,7 +89,9 @@ class AuthController extends Controller
                 $user= User::select(
                     'id',
                     'email',
-                    'role_id'
+                    'role_id',
+                    'name',
+                    'profile_pic'
                 )->with('role', function ($query) {
                     $query->select('id', 'role_name');
                 })->where('email', $request->email)->first();

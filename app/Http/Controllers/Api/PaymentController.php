@@ -127,12 +127,13 @@ class PaymentController extends Controller
  
         if (isset($payment)) {
             $data = $payment;
-            $data['Total Revenue'] = Payment::select('amount')->get()->sum('amount');
+            $payment_data['Total Revenue'] = Payment::select('amount')->get()->sum('amount');
             $message = __('user.fetch_payment_success');
             $status_code = SUCCESSCODE;
         }
         return response([
              'data' => $data,
+             'payment_data' => $payment_data,
              'message' => $message,
              'status_code' => $status_code
          ], $status_code);
@@ -169,16 +170,17 @@ class PaymentController extends Controller
   
         if (isset($payment)) {
             $data = $payment;
-            $data['Total Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->get()->sum('amount');
+            $payment_data['Total Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->get()->sum('amount');
 
             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->get()->sum('amount');
-            $data['Total Profit'] =  $data['Total Revenue'] - $total_payout;
+            $payment_data['Total Profit'] =  $payment_data['Total Revenue'] - $total_payout;
 
             $message = __('user.fetch_payment_success');
             $status_code = SUCCESSCODE;
         }
         return response([
               'data' => $data,
+              'payment_data' => $payment_data,
               'message' => $message,
               'status_code' => $status_code
           ], $status_code);
@@ -215,10 +217,6 @@ class PaymentController extends Controller
    
          if (isset($payment)) {
              $data = $payment;
-             $data['Total Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->get()->sum('amount');
-
-             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->get()->sum('amount');
-             $data['Total Profit'] =  $data['Total Revenue'] - $total_payout;
              $message = __('user.fetch_payment_success');
              $status_code = SUCCESSCODE;
          }

@@ -221,4 +221,33 @@ class UserController extends Controller
             'status_code' => $status_code
         ], $status_code);
     }
+
+    /* fetch User */
+    public function admin_fetch(Request $request, $user_id)
+    {
+        $users = [];
+        $message =  __('user.user_list_failed');
+        $status_code = BADREQUEST;
+  
+        $users = User::select(
+            'id',
+            'email',
+            'name',
+            'username',
+            'profile_pic',
+            'role_id'
+        )->with('role', function ($query) {
+            $query->select('id', 'role_name');
+        })->where('id', $user_id)->get();
+        
+        $message = __('user.user_list_success');
+        $status_code = SUCCESSCODE;
+ 
+        return response([
+             'data'        => $users,
+             'message'     => $message,
+             'status_code' => $status_code
+         ], $status_code);
+    }
+
 }
