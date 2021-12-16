@@ -158,7 +158,8 @@ class AdminController extends Controller
             DB::raw('role_name AS role'),
             DB::raw('users.id AS id'),
         )->leftJoin('roles', 'users.role_id', '=', 'roles.id')
-         ->where('role_name', '!=', 'User')
+        ->where('role_name', '!=', 'User')
+        ->where('role_name', '!=', 'Artist')
          ->where(DB::raw('users.id'), '=', $admin_id)->delete();
  
         if ($user_data === 1) {
