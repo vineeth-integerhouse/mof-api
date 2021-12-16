@@ -79,7 +79,7 @@ class DashboardController extends Controller
     
             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
             $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
-        } elseif ($request->input('filter_option') == 'custom') {
+        } elseif ($request->input('filter_option') == 'choose_date') {
             $start_date = date('Y-m-d', strtotime($request->input('start_date')));
             $end_date =date('Y-m-d', strtotime($request->input('end_date'))) ;
             $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
