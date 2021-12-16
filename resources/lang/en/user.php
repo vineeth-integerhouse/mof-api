@@ -86,4 +86,11 @@ return [
     'admin_subscription' =>    'Subscription fetched successfully',
     'unsubscribe_success' => 'User Unsubscribed successfully',
     'unsubscribe_failed' => 'User failed to unsubscribe',
+
+    'profile_views_success' => 'Profile views',
+    'profile_views_failed' => 'Failed to fetch profile views',
+    'fans_success' => 'Fans data',
+    'fans_failed' => 'Failed to fetch fans data',
+    'earnings_success' => 'Earnings data',
+    'earnings_failed' => 'Failed to fetch earnings data',
 ];
