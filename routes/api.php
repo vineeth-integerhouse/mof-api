@@ -177,16 +177,17 @@ Route::group([
     Route::group([
         'middleware' => ['auth:api', 'superadmin']
     ], function () {
-       
+        /*********************** Statictics******************** */
+        Route::get('admin/statistcs', [DashboardController::class, 'admin_statistcs']);
+     
+     
         /********************** Manage Admin ************ */
         Route::post('admin', [AdminController::class, 'add']);
         Route::delete('admin/{admin_id}', [AdminController::class, 'delete']);
         Route::put('admin/{admin_id}', [AdminController::class, 'update']);
         Route::get('admin', [AdminController::class, 'list']);
         Route::get('admin/{admin_id}', [AdminController::class, 'fetch']);
-
-        /*********************** Statictics******************** */
-        Route::get('admin/statistcs', [DashboardController::class, 'admin_statistcs']);
+      
     });
 });
 

@@ -153,9 +153,13 @@ class User extends Authenticatable
         return $users;
     }
 
-    public static function users_count($user_role)
+    public static function users_count($user_role, $start_date, $end_date)
     {
         $count  = User::with('role')
+        ->whereDate('users.created_at','>=',$start_date)
+        ->whereDate('users.created_at', '<=',$end_date )
+        ->whereYear('created_at', '=', $start_date)
+        ->whereYear('created_at', '=', $end_date)
             ->whereHas('role', function (Builder $query) use ($user_role) {
                 $query->select('id')->where('role_name', 'User');
             })->count();
@@ -163,9 +167,13 @@ class User extends Authenticatable
         return $count;
     }
 
-    public static function artists_count($user_role)
+    public static function artists_count($user_role, $start_date, $end_date)
     {
         $count  = User::with('role')
+        ->whereDate('users.created_at','>=',$start_date)
+        ->whereDate('users.created_at', '<=',$end_date )
+        ->whereYear('created_at', '=', $start_date)
+        ->whereYear('created_at', '=', $end_date)
             ->whereHas('role', function (Builder $query) use ($user_role) {
                 $query->select('id')->where('role_name', 'Artist');
             })->count();

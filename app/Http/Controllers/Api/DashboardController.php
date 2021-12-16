@@ -25,13 +25,69 @@ class DashboardController extends Controller
 
         $current_user=get_user();
 
-        $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER);
-        $widget_data['Registered Artists']  =  User::artists_count(USER_ROLE_ARTIST);
+        if ($request->input('filter_option') == 'all_time') {
+            $user_count  = User::with('role')
+            ->whereHas('role', function (Builder $query)  {
+                $query->select('id')->where('role_name', 'User');
+            })->count();
+         $widget_data['Registered Users']  =  $user_count;
+         $artist_count  = User::with('role')
+         ->whereHas('role', function (Builder $query)  {
+             $query->select('id')->where('role_name', 'Artist');
+         })->count();
+         $widget_data['Registered Artists']  =  $artist_count;
         $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->get()->sum('amount');
 
         $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->get()->sum('amount');
         $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+        } elseif ($request->input('filter_option') == 'today') {
 
+            $start_date = date('Y-m-d');
+            $end_date = date('Y-m-d');
+            $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
+            $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
+            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+    
+            $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+            $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+        } elseif ($request->input('filter_option') == 'this_week') {
+            $start_date = date('Y-m-d', strtotime('-1 week monday 00:00:00'));
+            $end_date = date('Y-m-d', strtotime('sunday 23:59:59'));
+            $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
+            $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
+            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+    
+            $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+            $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+        } elseif ($request->input('filter_option') == 'this_month') {
+            $start_date = date("Y-n-j", strtotime("first day of this month"));
+            $end_date = date("Y-n-j", strtotime("last day of this month"));
+            $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
+            $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
+            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+    
+            $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+            $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+        } elseif ($request->input('filter_option') == 'six_month') {
+            $start_date = date('Y-m-d', strtotime('-6 months 00:00:00'));
+            print_r($start_date);
+            $end_date = date('Y-m-d', strtotime('sunday 23:59:59'));
+            $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
+            $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
+            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+    
+            $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+            $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+        } elseif ($request->input('filter_option') == 'custom') {
+            $start_date = date('Y-m-d', strtotime($request->input('start_date')));
+            $end_date =date('Y-m-d', strtotime($request->input('end_date'))) ;
+            $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
+            $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
+            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+    
+            $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+            $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+        }
 
         $widget_data['current_user'] = User::select(
             'id',
