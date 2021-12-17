@@ -165,7 +165,9 @@ Route::group([
 
         /********************* Payout ************** */
         Route::get('admin/payment', [PaymentController::class, 'payment_list']);
+        Route::get('admin/payment/{payment_id}', [PaymentController::class, 'payment_fetch']);
         Route::get('admin/payout', [PaymentController::class, 'payout_list']);
+        Route::get('admin/payout/{payout_id}', [PaymentController::class, 'payout_fetch']);
 
         /********************* subscription ************** */
         Route::get('admin/subscription', [SubscriptionController::class, 'admin_list']);
