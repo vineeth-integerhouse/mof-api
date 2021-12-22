@@ -74,8 +74,7 @@ class DashboardController extends Controller
             $end_date = date('Y-m-d');
             $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
             $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
-            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
-    
+            $widget_data['Total Gross Revenue'] = admin_gross_revenue($start_date, $end_date);   
             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
             $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
             $performance['Profile Views'] = admin_profile_view_count($start_date, $end_date);
@@ -88,8 +87,7 @@ class DashboardController extends Controller
             $end_date = date('Y-m-d', strtotime('sunday 23:59:59'));
             $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
             $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
-            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
-    
+            $widget_data['Total Gross Revenue'] = admin_gross_revenue($start_date, $end_date);   
             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
             $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
             $performance['Profile Views'] = admin_profile_view_count($start_date, $end_date);
@@ -163,8 +161,7 @@ class DashboardController extends Controller
             $end_date = date('Y-m-d', strtotime('sunday 23:59:59'));
             $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
             $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
-            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
-    
+            $widget_data['Total Gross Revenue'] = admin_gross_revenue($start_date, $end_date);   
             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
             $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
             $performance['Profile Views'] = admin_profile_view_count($start_date, $end_date);
@@ -177,8 +174,7 @@ class DashboardController extends Controller
             $end_date =date('Y-m-d', strtotime($request->input('end_date'))) ;
             $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
             $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
-            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
-    
+            $widget_data['Total Gross Revenue'] = admin_gross_revenue($start_date, $end_date);    
             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
             $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
             $performance['Profile Views'] = admin_profile_view_count($start_date, $end_date);

@@ -63,3 +63,12 @@ function admin_earnings_count($start_date, $end_date)
                 ->whereDate('created_at', '<=', $end_date)
                 ->get()->sum('amount'); 
 }
+function admin_gross_revenue($start_date, $end_date)
+{
+    $total_gross_revenue = Payment::select('amount')
+    ->where('payin_payout','Payin')
+    ->whereDate('created_at', '>=', $start_date) 
+    ->whereDate('created_at', '<=', $end_date)
+    ->get()->sum('amount');
+    return $total_gross_revenue;
+}
