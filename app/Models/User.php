@@ -158,8 +158,6 @@ class User extends Authenticatable
         $count  = User::with('role')
         ->whereDate('users.created_at','>=',$start_date)
         ->whereDate('users.created_at', '<=',$end_date )
-        ->whereYear('created_at', '=', $start_date)
-        ->whereYear('created_at', '=', $end_date)
             ->whereHas('role', function (Builder $query) use ($user_role) {
                 $query->select('id')->where('role_name', 'User');
             })->count();
@@ -172,8 +170,6 @@ class User extends Authenticatable
         $count  = User::with('role')
         ->whereDate('users.created_at','>=',$start_date)
         ->whereDate('users.created_at', '<=',$end_date )
-        ->whereYear('created_at', '=', $start_date)
-        ->whereYear('created_at', '=', $end_date)
             ->whereHas('role', function (Builder $query) use ($user_role) {
                 $query->select('id')->where('role_name', 'Artist');
             })->count();

@@ -21,6 +21,9 @@ class DashboardController extends Controller
     public function admin_statistcs(Request $request)
     {
         $widget_data = [];
+        $performance = [];
+        $earnings = [];
+        $user_details = [];
         $message = __('user.statistics_failed');
         $status_code = BADREQUEST;
 
@@ -41,67 +44,160 @@ class DashboardController extends Controller
 
         $total_payout=Payment::select('amount')->where('payin_payout', 'Payouts')->get()->sum('amount');
         $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+        $profile_views= ActivityLog::select('profile_impressions') 
+                             ->where('activity_type', 'Profile Views')
+                             ->get()
+                             ->sum('profile_impressions');
+            if (!empty($profile_views)) {
+                $performance['Profile Views']= $profile_views;
+            } else {
+                $performance['Profile Views']=0;
+            }
+            $subscription= Subscription::get()->toArray();
+
+            $count_of_fans=0;
+            $count_of_lost_fans=0;
+            foreach ($subscription as $type) {
+                $count_of_fans+= UserSubscription::where('status', '1')->where('subscribe_id', $type['id'])->count();
+                $count_of_lost_fans+= UserSubscription::where('status', '0')->where('subscribe_id', $type['id'])->count();
+            }
+            $performance['Total Fans']=  $count_of_fans;
+            $performance['Total Lost Fans']=  $count_of_lost_fans;
+            $earnings['Total Earned'] = Payment::select('amount')
+            ->where('payin_payout', 'Payouts')
+            ->where('status', 'Paid')
+            ->get()->sum('amount');
+
         } elseif ($request->input('filter_option') == 'today') {
 
             $start_date = date('Y-m-d');
             $end_date = date('Y-m-d');
             $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
             $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
-            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
-    
+            $widget_data['Total Gross Revenue'] = admin_gross_revenue($start_date, $end_date);   
             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
             $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+            $performance['Profile Views'] = admin_profile_view_count($start_date, $end_date);
+            $performance['Total Fans'] = admin_fans_count($start_date, $end_date);
+            $performance['Total Lost Fans'] = admin_lost_fans_count($start_date, $end_date);
+            $earnings['Total Earned'] = admin_earnings_count($start_date, $end_date);
+
         } elseif ($request->input('filter_option') == 'this_week') {
             $start_date = date('Y-m-d', strtotime('-1 week monday 00:00:00'));
             $end_date = date('Y-m-d', strtotime('sunday 23:59:59'));
             $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
             $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
-            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
-    
+            $widget_data['Total Gross Revenue'] = admin_gross_revenue($start_date, $end_date);   
             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
             $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+            $performance['Profile Views'] = admin_profile_view_count($start_date, $end_date);
+            $performance['Total Fans'] = admin_fans_count($start_date, $end_date);
+            $performance['Total Lost Fans'] = admin_lost_fans_count($start_date, $end_date);
+            $earnings['Total Earned'] = admin_earnings_count($start_date, $end_date);
+
         } elseif ($request->input('filter_option') == 'this_month') {
-            $start_date = date("Y-n-j", strtotime("first day of this month"));
-            $end_date = date("Y-n-j", strtotime("last day of this month"));
-            $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
-            $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
-            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+            $year = date('Y');
+            $month = date('m');
+            $user_count  = User::with('role')
+            ->whereYear('created_at', '=', $year)
+            ->whereMonth('created_at', '=', $month)
+            ->whereHas('role', function (Builder $query)  {
+                $query->select('id')->where('role_name', 'User');
+            })->count();
+             $widget_data['Registered Users']  =  $user_count;
+             $artist_count  = User::with('role')
+             ->whereYear('created_at', '=', $year)
+             ->whereMonth('created_at', '=', $month)
+             ->whereHas('role', function (Builder $query)  {
+                 $query->select('id')->where('role_name', 'Artist');
+             })->count();
+             $widget_data['Registered Artists']  =  $artist_count;
+             $widget_data['Total Gross Revenue'] = Payment::select('amount')
+                ->where('payin_payout','Payin')
+               ->whereYear('created_at', '=', $year)
+               ->whereMonth('created_at', '=', $month)->get()->sum('amount');
     
-            $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
-            $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')
+              ->whereYear('created_at', '=', $year)
+              ->whereMonth('created_at', '=', $month)->get()->sum('amount');
+              $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+              $profile_views= ActivityLog::select('profile_impressions') 
+                 ->where('activity_type', 'Profile Views')
+                 ->whereYear('created_at', '=', $year)
+                 ->whereMonth('created_at', '=', $month)
+                 ->get()
+                 ->sum('profile_impressions');
+                if (!empty($profile_views)) {
+                $performance['Profile Views']= $profile_views;
+                } else {
+                $performance['Profile Views']=0;
+                }
+          
+                $count_of_fans=0;
+                $count_of_lost_fans=0;
+                $subscription= Subscription::get()->toArray();
+
+                foreach ($subscription as $type) {
+                $count_of_fans+= UserSubscription::where('status', '1')
+                ->where('subscribe_id', $type['id'])
+                ->whereYear('created_at', '=', $year)
+                ->whereMonth('created_at', '=', $month)->count();
+                $count_of_lost_fans+= UserSubscription::where('status', '0')
+                ->where('subscribe_id', $type['id'])
+                ->whereYear('created_at', '=', $year)
+                ->whereMonth('created_at', '=', $month)->count();
+                }
+            
+                $performance['Total Fans']=  $count_of_fans;
+                $performance['Total Lost Fans']=  $count_of_lost_fans;
+                $earnings['Total Earned'] = Payment::select('amount')
+                ->where('payin_payout', 'Payouts')
+                ->where('status', 'Paid')
+                ->whereYear('created_at', '=', $year)
+                ->whereMonth('created_at', '=', $month)
+                ->get()->sum('amount');
         } elseif ($request->input('filter_option') == 'six_month') {
             $start_date = date('Y-m-d', strtotime('-6 months 00:00:00'));
-            $end_date = date('Y-m-d');
             $end_date = date('Y-m-d', strtotime('sunday 23:59:59'));
             $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
             $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
-            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
-    
+            $widget_data['Total Gross Revenue'] = admin_gross_revenue($start_date, $end_date);   
             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
             $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+            $performance['Profile Views'] = admin_profile_view_count($start_date, $end_date);
+            $performance['Total Fans'] = admin_fans_count($start_date, $end_date);
+            $performance['Total Lost Fans'] = admin_lost_fans_count($start_date, $end_date);
+            $earnings['Total Earned'] = admin_earnings_count($start_date, $end_date);
+
         } elseif ($request->input('filter_option') == 'choose_date') {
             $start_date = date('Y-m-d', strtotime($request->input('start_date')));
             $end_date =date('Y-m-d', strtotime($request->input('end_date'))) ;
             $widget_data['Registered Users']  =  User::users_count(USER_ROLE_USER, $start_date, $end_date);
             $widget_data['Registered Artists']  = User::artists_count(USER_ROLE_ARTIST,  $start_date, $end_date);
-            $widget_data['Total Gross Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
-    
+            $widget_data['Total Gross Revenue'] = admin_gross_revenue($start_date, $end_date);    
             $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
             $widget_data['Total Gross Profits'] =   $widget_data['Total Gross Revenue'] - $total_payout;
+            $performance['Profile Views'] = admin_profile_view_count($start_date, $end_date);
+            $performance['Total Fans'] = admin_fans_count($start_date, $end_date);
+            $performance['Total Lost Fans'] = admin_lost_fans_count($start_date, $end_date);
+            $earnings['Total Earned'] = admin_earnings_count($start_date, $end_date);
         }
 
-        $widget_data['current_user'] = User::select(
+        $user_details['current_user'] = User::select(
             'id',
             'role_id',
             'name',
             'email',
         )->where('id', $current_user->id)->get()->first();
-        if ($widget_data) {
+        if ($user_details) {
             $message =   __('user.statistics_success');
             $status_code = SUCCESSCODE;
         }
         return response([
             'data'        => $widget_data,
+            'performance' => $performance,
+            'earnings'    => $earnings,
+            'user_details'=>$user_details,
             'message'     => $message,
             'status_code' => $status_code
         ]);
