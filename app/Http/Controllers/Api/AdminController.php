@@ -89,6 +89,7 @@ class AdminController extends Controller
                 if (isset($request->password)) {
                     $update['password'] =  bcrypt($request->password);
                 }
+                $update['profile_pic'] = $request->profile_pic;
 
                 $update['updated_at'] = date("Y-m-d H:i:s");
                 $role =$user_data->role_id;
@@ -102,6 +103,7 @@ class AdminController extends Controller
                         'email',
                         'role_id',
                         'role_name',
+                        'profile_pic',
                         )->leftJoin('roles', 'users.role_id', '=', 'roles.id'
                     )->where('users.id', $admin_id)->get()->first();
                     $message = __('user.update_success');
