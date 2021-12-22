@@ -163,7 +163,8 @@ class PaymentController extends Controller
             'payer',
             'payee',
             'profile_pic',
-            'payin_payout'
+            'payin_payout',
+            'username'
         )->leftJoin('users', 'users.id', '=', 'payments.payer')
         ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
         ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
@@ -186,6 +187,44 @@ class PaymentController extends Controller
           ], $status_code);
     }
 
+
+    /*Admin fetch Payments */
+    public function payment_fetch(Request $request,$payment_id)
+    {
+        $data = [];
+        $message = __('user.fetch_payment failed');
+        $status_code = BADREQUEST;
+  
+        $payment = Payment::withTrashed()->select(
+            'payments.id',
+            'payments.name',
+            'payment_date',
+            'amount',
+            'stripe_reference_number',
+            'status',
+            'payer',
+            'payee',
+            'profile_pic',
+            'payin_payout',
+            'username'
+        )->leftJoin('users', 'users.id', '=', 'payments.payer')
+        ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
+        ->where(DB::raw('payments.id'),$payment_id)
+       ->first();
+  
+        if (isset($payment)) {
+            $data = $payment;
+    
+            $message = __('user.fetch_payment_success');
+            $status_code = SUCCESSCODE;
+        }
+        return response([
+              'data' => $data,
+              'message' => $message,
+              'status_code' => $status_code
+          ], $status_code);
+    }
+
      /*Admin List Payouts */
      public function payout_list(Request $request)
      {
@@ -202,7 +241,7 @@ class PaymentController extends Controller
    
          $payment = Payment::select(
              'payments.id',
-             'payments.name',
+             'users.name',
              'payment_date',
              'amount',
              'stripe_reference_number',
@@ -210,8 +249,9 @@ class PaymentController extends Controller
              'payer',
              'payee',
              'profile_pic',
-             'payin_payout'
-         )->leftJoin('users', 'users.id', '=', 'payments.payer')
+             'payin_payout',
+             'username'
+         )->leftJoin('users', 'users.id', '=', 'payments.payee')
          ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
          ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
    
@@ -226,6 +266,45 @@ class PaymentController extends Controller
                'status_code' => $status_code
            ], $status_code);
      }
+
+      /*Admin Fetch Payouts */
+      public function payout_fetch(Request $request,$payout_id)
+      {
+          $data = [];
+          $message = __('user.fetch_payment failed');
+          $status_code = BADREQUEST;
+    
+          $payment = Payment::select(
+              'payments.id',
+              'users.name',
+              'payment_date',
+              'amount',
+              'stripe_reference_number',
+              'status',
+              'payer',
+              'payee',
+              'profile_pic',
+              'payin_payout',
+              'username'
+          )->leftJoin('users', 'users.id', '=', 'payments.payee')
+          ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
+          ->where(DB::raw('payments.id'),$payout_id)
+          ->first();
+     
+    
+          if (isset($payment)) {
+              $data = $payment;
+              $message = __('user.fetch_payment_success');
+              $status_code = SUCCESSCODE;
+          }
+          return response([
+                'data' => $data,
+                'message' => $message,
+                'status_code' => $status_code
+            ], $status_code);
+      }
+  
+ 
  
 
     public function update(Request $request)
