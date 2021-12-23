@@ -86,10 +86,7 @@ function artist_earnings_count($user_id, $start_date, $end_date)
 }
 function artist_fans_count($user_id, $start_date, $end_date)
 {
-    $subscription= Subscription::where('user_id', $user_id)
-        ->whereDate('created_at', '>=', $start_date)
-        ->whereDate('created_at', '<=', $end_date)->get()->toArray();
-
+    $subscription= Subscription::where('user_id', $user_id)->get()->toArray();
         $count_of_fans=0;
         foreach ($subscription as $type) {
             $count_of_fans+= UserSubscription::where('status', '1')
@@ -99,6 +96,20 @@ function artist_fans_count($user_id, $start_date, $end_date)
         ->count();
         }
     return $count_of_fans;
+}
+function artist_lost_fans_count($user_id, $start_date, $end_date)
+{
+    $subscription= Subscription::where('user_id', $current_user->id)->get()->toArray();
+    $subscription= Subscription::where('user_id', $user_id)->get()->toArray();
+    $count_of_lost_fans=0;
+    foreach ($subscription as $type) {
+        $count_of_lost_fans+= UserSubscription::where('status', '0')
+            ->where('subscribe_id', $type['id'])
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->count();
+    }
+    return $count_of_lost_fans;
 }
 function artist_profile_impression_count($user_id, $start_date, $end_date)
 {
