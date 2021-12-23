@@ -99,7 +99,6 @@ function artist_fans_count($user_id, $start_date, $end_date)
 }
 function artist_lost_fans_count($user_id, $start_date, $end_date)
 {
-    $subscription= Subscription::where('user_id', $current_user->id)->get()->toArray();
     $subscription= Subscription::where('user_id', $user_id)->get()->toArray();
     $count_of_lost_fans=0;
     foreach ($subscription as $type) {
