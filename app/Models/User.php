@@ -66,11 +66,9 @@ class User extends Authenticatable
         $users = User::select(
             'name',
             'email',
-            'role_id',
+            DB::raw('role_name AS role'),
             DB::raw('users.id AS id'),
-        )->with('role', function ($query) {
-                $query->select('id', 'role_name');
-            })
+            )->leftJoin('roles', 'users.role_id', '=', 'roles.id')     
         ->whereHas('role', function (Builder $query) use ($user_role) {
                if ($user_role) {
                    $query->where('role_name', $user_role);

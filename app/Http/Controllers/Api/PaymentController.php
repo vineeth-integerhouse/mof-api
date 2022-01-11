@@ -100,8 +100,44 @@ class PaymentController extends Controller
         ]);
     }
     
-    /* List Payments */
-    public function list(Request $request)
+    /* Artist List Payments */
+    public function artist_payment_list(Request $request)
+    {
+        $data = [];
+        $message = __('user.fetch_payment failed');
+        $status_code = BADREQUEST;
+        $current_user = get_user();
+        $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
+        $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
+        $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
+ 
+        $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
+        $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+ 
+        $payment = Payment::select(
+            'id',
+            'name',
+            'amount',
+            'payment_date',
+            'status',
+            'payment_method',
+            'payer',
+            'payee',
+        )->where('payer', $current_user->id)->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+ 
+        if (isset($payment)) {
+            $message = __('user.fetch_payment_success');
+            $status_code = SUCCESSCODE;
+        }
+        return response([
+             'data' => $data,
+             'message' => $message,
+             'status_code' => $status_code
+         ], $status_code);
+    }
+
+    /* Artist List Payout */
+    public function artist_payout_list(Request $request)
     {
         $data = [];
         $message = __('user.fetch_payment failed');
@@ -127,7 +163,7 @@ class PaymentController extends Controller
  
         if (isset($payment)) {
             $data = $payment;
-            $payment_data['Total Revenue'] = Payment::select('amount')->get()->sum('amount');
+            $payment_data['Current Payout Balance'] = Payment::select('amount')->where('payee', $current_user->id)->get()->sum('amount');
             $message = __('user.fetch_payment_success');
             $status_code = SUCCESSCODE;
         }

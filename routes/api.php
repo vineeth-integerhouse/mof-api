@@ -91,13 +91,10 @@ Route::group([
 
         /********************** Settings ************ */
 
+        Route::get('artist/{artist_id}/settings', [ArtistController::class, 'settings']);
         Route::put('artist/password', [ArtistController::class, 'update_password']);
         Route::put('artist/email', [ArtistController::class, 'update_email']);
 
-
-        /********************** Setup profile ************ */
-
-        Route::put('artist', [ArtistController::class, 'set_up_profile']);
 
         /********************** Delete account ************ */
 
@@ -121,7 +118,8 @@ Route::group([
 
 
         /*******************  Payments ****************** */
-        Route::get('artist/payment', [PaymentController::class, 'list']);
+        Route::get('artist/payment', [PaymentController::class, 'artist_payment_list']);
+        Route::get('artist/payout', [PaymentController::class, 'artist_payout_list']);
 
         /*******************  Subscription ****************** */
         Route::post('artist/subscription', [SubscriptionController::class, 'add']);
@@ -163,6 +161,7 @@ Route::group([
 
         /********************** Settings ************ */
         Route::put('admin/settings', [AdminController::class, 'settings']);
+        Route::get('admin/{admin_id}/settings', [AdminController::class, 'fetch_settings']);
 
         /********************* Payout ************** */
         Route::get('admin/payment', [PaymentController::class, 'payment_list']);

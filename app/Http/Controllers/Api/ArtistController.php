@@ -21,10 +21,8 @@ use Illuminate\Support\Facades\Mail;
 class ArtistController extends Controller
 {
     /* Setup Profile */
-    public function set_up_profile(Request $request)
+    public function set_up_profile(Request $request, $artist_id)
     {
-        $current_user=get_user();
-
         $data = [];
       
         $message = '';
@@ -48,18 +46,18 @@ class ArtistController extends Controller
 
             if (count($update) != 0) {
                 $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
-                DB::table('users')->where('id', $current_user->id)->where('role_id', $role)->update($update);
+                DB::table('users')->where('id', $artist_id)->where('role_id', $role)->update($update);
             }
 
             $genre= $request->genre_type_id;
             for ($i=0;$i<count($genre);$i++) {
-                $genre_data = ['user_id'=>$current_user->id, 'genre_type_id' => $request->genre_type_id[$i]];
+                $genre_data = ['user_id'=>$artist_id, 'genre_type_id' => $request->genre_type_id[$i]];
                 Genre::updateOrCreate($genre_data);
             }
     
             $profile_update['social_profile_type_id'] = $request->social_profile_type_id;
             $profile_update['social_profile_username'] = $request->social_profile_username;
-            $profile_update['user_id']=$current_user->id;
+            $profile_update['user_id']=$artist_id;
            
             if (count($profile_update) != 0) {
                 SocialProfile::updateOrCreate($profile_update);
@@ -80,18 +78,18 @@ class ArtistController extends Controller
             'profile_pic',
             'bio',
             'payment_method',
-        )->where('id', $current_user->id)->get()->first();
+        )->where('id', $artist_id)->get()->first();
 
         $data['Social Links']= SocialProfile::select(
             'id',
             'social_profile_type_id',
             'social_profile_username'
-        )->where('user_id', $current_user->id)->get();
+        )->where('user_id', $artist_id)->get();
 
         $data['Genre']= Genre::select(
             'id',
             'genre_type_id',
-        )->where('user_id', $current_user->id)->get();
+        )->where('user_id', $artist_id)->get();
     
 
         return response([
@@ -219,15 +217,15 @@ class ArtistController extends Controller
         $message = __('user.update_failed');
         $status_code = BADREQUEST;
 
-        $current_user=get_user();
+        $user = User::find($request->id); 
 
-        if ($current_user) {
+        if ($user) {
             try {
                 $update = [];
 
                 if (isset($request->password) && isset($request->password_confirmation) && isset($request->current_password)) {
                     if ($request->password === $request->password_confirmation) {
-                        if (Hash::check($request->current_password, $current_user->password)) {
+                        if (Hash::check($request->current_password, $user->password)) {
                             $update['password'] = bcrypt($request->password);
                         } else {
                             $existing_password_check = false;
@@ -235,14 +233,14 @@ class ArtistController extends Controller
                     } else {
                         $password_confirmation = false;
                     }
-                    if (!Hash::check($request->current_password, $current_user->password)) {
+                    if (!Hash::check($request->current_password, $user->password)) {
                         $existing_password_check = false;
                     }
                 }
         
                 $update['updated_at'] = date("Y-m-d H:i:s");
                 if (count($update) != 0) {
-                    DB::table('users')->where('id', $current_user->id)->update($update);
+                    DB::table('users')->where('id', $user->id)->update($update);
                 }
                 $message = __('user.password');
                 $status_code = SUCCESSCODE;
@@ -252,7 +250,7 @@ class ArtistController extends Controller
                     'name',
                     'email',
                     'profile_pic'
-                )->where('id', $current_user->id)->get()->first();
+                )->where('id', $user->id)->get()->first();
                 
                 $error = [];
                 if ($password_confirmation == false) {
@@ -292,15 +290,15 @@ class ArtistController extends Controller
         $message = __('user.update_failed');
         $status_code = BADREQUEST;
 
-        $current_user=get_user();
+        $user = User::find($request->id); 
 
-        if ($current_user) {
+        if ($user) {
             try {
                 $update = [];
 
                 if (isset($request->email) && isset($request->email_confirmation) && isset($request->current_email)) {
                     if ($request->email === $request->email_confirmation) {
-                        if ($request->current_email==$current_user->email) {
+                        if ($request->current_email==$user->email) {
                             $update['email'] = $request->email;
                         } else {
                             $existing_email_check = false;
@@ -308,19 +306,19 @@ class ArtistController extends Controller
                     } else {
                         $email_confirmation = false;
                     }
-                    if ($request->current_email != $current_user->email) {
+                    if ($request->current_email != $user->email) {
                         $existing_email_check = false;
                     }
                 }
 
                 if (isset($request->email)) {
                     $update['email'] = $request->email;
-                    $users_count = User::withTrashed()->where('email', $request->email)->where('id', '!=', $current_user->id)->count();
+                    $users_count = User::withTrashed()->where('email', $request->email)->where('id', '!=', $request->id)->count();
                 }
         
                 $update['updated_at'] = date("Y-m-d H:i:s");
                 if (count($update) != 0) {
-                    DB::table('users')->where('id', $current_user->id)->update($update);
+                    DB::table('users')->where('id',$request->id)->update($update);
                 }
                 $message = __('user.email');
                 $status_code = SUCCESSCODE;
@@ -330,7 +328,7 @@ class ArtistController extends Controller
                     'name',
                     'email',
                     'profile_pic'
-                )->where('id', $current_user->id)->get()->first();
+                )->where('id', $request->id)->get()->first();
             
                 $error = [];
 
@@ -504,6 +502,33 @@ class ArtistController extends Controller
             'profile_pic',
             'deleted_at',
         )->where('id', $artist_id)->where('role_id', $role)->first();
+
+        if (isset($data)) {
+            $message = __('user.user_list_success');
+            $status_code = SUCCESSCODE;
+        }
+  
+        return response([
+              'data'        => $data,
+              'message'     => $message,
+              'status_code' => $status_code
+          ], $status_code);
+    }
+
+    public function settings(Request $request, $artist_id)
+    {
+        $message =  __('user.not_artist');
+        $status_code = BADREQUEST;
+  
+        $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+
+        $data= User::select(
+            'id',
+            'email',
+            'name',
+            'username',
+            'profile_pic',
+        )->where('id', $artist_id)->where('role_id', $role)->get()->first();
 
         if (isset($data)) {
             $message = __('user.user_list_success');
