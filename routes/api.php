@@ -64,6 +64,10 @@ Route::group([
         Route::put('unsubscribe/{subscribe_id}', [SubscriptionController::class, 'unsubscribe']);
         Route::get('subscribe', [SubscriptionController::class, 'list']);
 
+         /********************** fetch profile ************ */
+
+         Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
+
         /* Seeder routes*/
         Route::get('role', [SeedController::class, 'role']);
         Route::get('genre_type', [SeedController::class, 'genre_type']);
@@ -129,9 +133,6 @@ Route::group([
         Route::get('artist/fans', [DashboardController::class, 'fans']);
         Route::get('artist/earnings', [DashboardController::class, 'earnings']);
 
-        /********************** fetch profile ************ */
-
-        Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
     });
 });
 
