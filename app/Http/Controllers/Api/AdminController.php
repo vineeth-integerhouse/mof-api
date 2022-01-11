@@ -193,9 +193,9 @@ class AdminController extends Controller
         $message = __('user.update_failed');
         $status_code = BADREQUEST;
    
-        $current_user=get_user();
+        $user = User::find($request->id);
    
-        if ($current_user) {
+        if ($user) {
             try {
                 $update = [];
                 if (isset($request->password) && isset($request->password_confirmation)) {
@@ -207,7 +207,7 @@ class AdminController extends Controller
                 }
                 if (isset($request->email)) {
                     $update['email'] = $request->email;
-                    $users_count = User::withTrashed()->where('email', $request->email)->where('id', '!=', $current_user->id)->count();
+                    $users_count = User::withTrashed()->where('email', $request->email)->where('id', '!=', $request->id)->count();
                 }
                 if ($users_count == 0 && $password_confirmation == true) {
                     if (isset($request->name)) {
@@ -218,7 +218,7 @@ class AdminController extends Controller
                
                     $update['updated_at'] = date("Y-m-d H:i:s");
                     if (count($update) != 0) {
-                        DB::table('users')->where('id', $current_user->id)->update($update);
+                        DB::table('users')->where('id', $request->id)->update($update);
                     }
                     $message = __('user.user_settings');
                     $status_code = SUCCESSCODE;
@@ -228,7 +228,7 @@ class AdminController extends Controller
                         'name',
                         'email',
                         'profile_pic'
-                    )->where('id', $current_user->id)->get()->first();
+                    )->where('id', $request->id)->get()->first();
                 }
                 $error = [];
                 if ($users_count!=0) {
@@ -255,6 +255,34 @@ class AdminController extends Controller
          'status_code' => $status_code,
        ], $status_code);
     }
+
+      /* fetch Admin Settings*/
+      public function fetch_settings(Request $request, $admin_id)
+      {
+          $user_data = [];
+          $data      = [];
+          $message =  __('user.admin_failed');
+          $status_code = BADREQUEST;
+  
+          $user_data =User::select(
+              'email',
+              'name',
+              'profile_pic',
+              DB::raw('users.id AS id'),
+          )->where('role_id', '!=', '3')
+           ->where('role_id', '!=', '4')
+           ->where(DB::raw('users.id'), '=', $admin_id)->first();
+           if (isset($user_data)) {
+              $message = __('user.user_list_success');
+              $status_code = SUCCESSCODE;
+          }
+  
+          return response([
+              'data'        => $user_data,
+              'message'     => $message,
+              'status_code' => $status_code
+          ], $status_code);
+      }
     
     /* fetch Admin */
     public function fetch(Request $request, $admin_id)

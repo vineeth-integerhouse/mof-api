@@ -211,6 +211,50 @@ class DashboardController extends Controller
 
         $current_user=get_user();
 
+
+        if ($request->input('filter_option') == '') {
+            $subscription= Subscription::where('user_id', $current_user->id)->get()->toArray();
+
+            $count_of_fans=0;
+            foreach ($subscription as $type) {
+                $count_of_fans+= UserSubscription::where('status', '1')->where('subscribe_id', $type['id'])->count();
+            }
+            $widget_data['Total Fans']=  $count_of_fans;
+
+            $impression=ActivityLog::where('artist_id', $current_user->id)->get('profile_impressions')->first();
+            if (!empty($impression)) {
+                $widget_data['Total Profile Impressions']= $impression['profile_impressions'];
+            } else {
+                $widget_data['Total Profile Impressions']=0;
+            }
+
+            $count_of_comments=0;
+            $count_of_likes=0;
+            $post_comment= Post::with('comment')->where('user_id', $current_user->id)->get()->toArray();
+
+            foreach ($post_comment as $type) {
+                $count_of_comments+= count($type['comment']);
+            }
+
+            $post_like= Post::with('like')->where('user_id', $current_user->id)->get()->toArray();
+
+            foreach ($post_like as $type) {
+                $count_of_likes+= count($type['like']);
+            }
+
+            if (($widget_data['Total Profile Impressions'])>0) {
+                $engagement_rate=(($count_of_comments+$count_of_likes)/$widget_data['Total Profile Impressions'])*100;
+                $widget_data['Engagement Rate'] = $engagement_rate ;
+            } else {
+                $widget_data['Engagement Rate'] = 0;
+            }
+
+            $widget_data['Total Earned'] = Payment::select('amount')
+            ->where('payee', $current_user->id)
+            ->where('payin_payout', 'Payouts')
+            ->where('status', 'Paid')
+            ->get()->sum('amount');
+        } else
         if ($request->input('filter_option') == 'all_time') {
             $subscription= Subscription::where('user_id', $current_user->id)->get()->toArray();
 
@@ -543,7 +587,34 @@ class DashboardController extends Controller
 
         $current_user=get_user();
 
-        if ($request->input('filter_option') == 'all_time') {
+        if ($request->input('filter_option') == '') {
+            $profile_views= ActivityLog::where('activity_type', 'Profile Views')
+                            ->where('artist_id', $current_user->id)
+                            ->get('profile_impressions')
+                            ->first();
+                            
+            if (!empty($profile_views)) {
+                $widget_data['Profile Views']= $profile_views['profile_impressions'];
+            } else {
+                $widget_data['Profile Views']=0;
+            }
+        } elseif ($request->input('filter_option') == 'last_7days') {
+            $start_date = date('Y-m-d', strtotime('-7 days'));
+            $end_date = date('Y-m-d');
+
+            $profile_views= ActivityLog::where('activity_type', 'Profile Views')
+                             ->whereDate('created_at', '>=', $start_date)
+                             ->whereDate('created_at', '<=', $end_date)
+                             ->where('artist_id', $current_user->id)
+                             ->get('profile_impressions')
+                             ->first();
+               
+            if (!empty($profile_views)) {
+                $widget_data['Profile Views']= $profile_views['profile_impressions'];
+            } else {
+                $widget_data['Profile Views']=0;
+            }
+        } elseif ($request->input('filter_option') == 'all_time') {
             $profile_views= ActivityLog::where('activity_type', 'Profile Views')
                             ->where('artist_id', $current_user->id)
                             ->get('profile_impressions')
@@ -644,7 +715,18 @@ class DashboardController extends Controller
 
         $current_user=get_user();
 
-        if ($request->input('filter_option') == 'all_time') {
+        if ($request->input('filter_option') == '') {
+            $subscription= Subscription::where('user_id', $current_user->id)->get()->toArray();
+
+            $count_of_fans=0;
+            $count_of_lost_fans=0;
+            foreach ($subscription as $type) {
+                $count_of_fans+= UserSubscription::where('status', '1')->where('subscribe_id', $type['id'])->count();
+                $count_of_lost_fans+= UserSubscription::where('status', '0')->where('subscribe_id', $type['id'])->count();
+            }
+            $widget_data['Fans']=  $count_of_fans;
+            $widget_data['Lost Fans']=  $count_of_lost_fans;
+        } elseif ($request->input('filter_option') == 'all_time') {
             $subscription= Subscription::where('user_id', $current_user->id)->get()->toArray();
 
             $count_of_fans=0;
@@ -768,7 +850,13 @@ class DashboardController extends Controller
 
         $current_user=get_user();
 
-        if ($request->input('filter_option') == 'all_time') {
+        if ($request->input('filter_option') == '') {
+            $widget_data['Total Earned'] = Payment::select('amount')
+            ->where('payee', $current_user->id)
+            ->where('payin_payout', 'Payouts')
+            ->where('status', 'Paid')
+            ->get()->sum('amount');
+        } elseif ($request->input('filter_option') == 'all_time') {
             $widget_data['Total Earned'] = Payment::select('amount')
             ->where('payee', $current_user->id)
             ->where('payin_payout', 'Payouts')
@@ -780,6 +868,7 @@ class DashboardController extends Controller
 
             $widget_data['Total Earned'] = Payment::select('amount')
             ->where('payee', $current_user->id)
+            
             ->where('payin_payout', 'Payouts')
             ->where('status', 'Paid')
             ->whereDate('created_at', '>=', $start_date)

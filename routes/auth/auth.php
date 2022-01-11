@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ArtistController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\SocialiteController;
 use Illuminate\Support\Facades\Route;
@@ -33,5 +34,8 @@ Route::group([
 
     Route::post('auth/google', [SocialiteController::class, 'google_login']);
     Route::post('auth/facebookj', [SocialiteController::class, 'facebook_login']);
-  
+
+    /********************** Setup profile ************ */
+
+    Route::put('artist/{artist_id}', [ArtistController::class, 'set_up_profile']);
 });
