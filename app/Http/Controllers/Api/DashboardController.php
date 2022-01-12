@@ -714,6 +714,7 @@ class DashboardController extends Controller
             ->whereDate('created_at', '>=', $start_date)
             ->whereDate('created_at', '<=', $end_date)
             ->get()->sum('amount');
+
             $widget_data['Total Earned'] = artist_earnings_count($current_user->id, $start_date, $end_date);
         } elseif ($request->input('filter_option') == 'this_month') {
             $year = date('Y');
