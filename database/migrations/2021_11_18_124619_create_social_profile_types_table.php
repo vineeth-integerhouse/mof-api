@@ -15,9 +15,8 @@ class CreateSocialProfileTypesTable extends Migration
     {
         Schema::create('social_profile_types', function (Blueprint $table) {
             $table->id();
-
             $table->string('profile_type')->unique();
-            
+            $table->string('profile_img');
             $table->softDeletes();
             $table->timestamps();
         });
