@@ -156,7 +156,7 @@ class SeedController extends Controller
           $message = __('seeder.seed_fail');
           $status_code = BADREQUEST;
   
-          $seed_details = SocialProfileType::select('id', 'profile_type')->get();
+          $seed_details = SocialProfileType::select('id', 'profile_type', 'profile_img')->get();
   
           if (isset($seed_details)) {
               $message = __('seeder.seed_success');
