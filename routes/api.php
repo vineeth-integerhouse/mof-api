@@ -64,9 +64,9 @@ Route::group([
         Route::put('unsubscribe/{subscribe_id}', [SubscriptionController::class, 'unsubscribe']);
         Route::get('subscribe', [SubscriptionController::class, 'list']);
 
-         /********************** fetch profile ************ */
+        // /********************** fetch profile ************ */
 
-         Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
+        // Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
 
         /* Seeder routes*/
         Route::get('role', [SeedController::class, 'role']);
@@ -87,7 +87,17 @@ Route::group([
     Route::group([
         'middleware' => ['auth:api', 'artist']
     ], function () {
+
+        Route::get('artist/post', [PostController::class, 'list']);
+
+        Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
+
+        
         Route::get('artist/logout', [AuthController::class, 'logout']);
+
+        /********************** Setup profile ************ */
+
+        Route::put('artist/{artist_id}', [ArtistController::class, 'set_up_profile']);
 
         /********************** Settings ************ */
 
@@ -105,8 +115,8 @@ Route::group([
         Route::post('artist/post', [PostController::class, 'add']);
         Route::put('artist/post/{post_id}', [PostController::class, 'update']);
         Route::delete('artist/post/{post_id}', [PostController::class, 'delete']);
+       
         Route::get('artist/post/{post_id}', [PostController::class, 'get']);
-        Route::get('artist/post', [PostController::class, 'list']);
 
         /********************** Tour ************ */
 
@@ -132,7 +142,6 @@ Route::group([
         Route::get('artist/views', [DashboardController::class, 'profile_views']);
         Route::get('artist/fans', [DashboardController::class, 'fans']);
         Route::get('artist/earnings', [DashboardController::class, 'earnings']);
-
     });
 });
 
