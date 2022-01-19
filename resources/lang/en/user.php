@@ -10,16 +10,16 @@ return [
     'admin_add_failed' => 'Failed to create a new admin member',
     'admin_add_success' => 'Admin member has been successfully added',
     'admin_delete_success'=>'Admin deleted successfully',
-    'admin_failed'=>'Not a admin',
+    'admin_failed'=>'Not an admin',
 
     'user_list_success' => 'Data fetched successfully',
     'user_list_failed' => "No user data available",
 
     'user_delete_success'=>'User deleted successfully',
-    'not_user'=>'Not a User',
+    'not_user'=>'Not an User',
 
     'artist_delete_success'=>'Artist deleted successfully',
-    'not_artist'=>'Not a Artist',
+    'not_artist'=>'Not an Artist',
 
     'email_in_use' => 'Email already in use',
     'password_not_match' => 'The password confirmation does not match.',

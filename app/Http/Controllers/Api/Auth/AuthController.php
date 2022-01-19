@@ -46,6 +46,32 @@ class AuthController extends Controller
                 'email',
             )->where('id', $inserted_data->id)->get()->first();
 
+            $login_data['email'] = $request->email;
+            $login_data['password'] = $request->password;
+
+            if (auth()->attempt($login_data)) {
+                $user= User::select(
+                    'id',
+                    'email',
+                    'role_id',
+                    'name',
+                    'profile_pic'
+                )->with('role', function ($query) {
+                    $query->select('id', 'role_name');
+                })->where('email', $request->email)->first();
+                      
+                $access_token = $user->createToken('authToken')->accessToken;
+                if ($user->role->role_name == USER_ROLE_SUPERADMIN) {
+                    $data = ['access_token' => $access_token, 'user' => $user];
+                } elseif ($user->role->role_name == USER_ROLE_ADMIN) {
+                    $data = ['access_token' => $access_token, 'user' => $user];
+                } elseif ($user->role->role_name == USER_ROLE_MODERATOR) {
+                    $data = ['access_token' => $access_token, 'user' => $user];
+                } else {
+                    $data = ['access_token' => $access_token, 'user' => $user];
+                }
+            }
+
             $message = __('user.register_success');
             $status_code = SUCCESSCODE;
 
