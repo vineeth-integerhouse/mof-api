@@ -51,6 +51,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function profile_view()
+    {
+        return $this->hasMany(ProfileView::class);
+    }
+
 
     public static function active_admin_list($user_role, $request)
     {

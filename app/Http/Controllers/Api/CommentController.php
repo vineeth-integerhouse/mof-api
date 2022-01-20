@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Like;
+use App\Models\ProfileView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -130,6 +131,38 @@ class CommentController extends Controller
           
         return response([
             'data' => $like,
+            'message' => $message,
+            'status_code' => $status_code,
+        ], $status_code);
+    }
+
+    public function profile_views(Request $request)
+    {
+        $data = [];
+       
+        $message = __('user.add_like_failed');
+        $status_code = BADREQUEST;
+ 
+        $current_user = get_user();
+   
+        $inserted_data = ProfileView::create(
+            [
+                'user_id'=> $request->artist_id,
+         
+             'profile_view'=> DB::raw('profile_view+1'),
+           ]
+        );
+        
+        $profile_views= ProfileView::select(
+            'id',
+            'user_id',
+            'profile_view'
+        )->where('id', $inserted_data->id)->get()->first();
+        $message = __('user.add_like_success');
+        $status_code = SUCCESSCODE;
+          
+        return response([
+            'data' => $profile_views,
             'message' => $message,
             'status_code' => $status_code,
         ], $status_code);
