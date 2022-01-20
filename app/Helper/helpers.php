@@ -9,6 +9,7 @@ use App\Models\Subscription;
 use App\Models\UserSubscription;
 use App\Models\Payment;
 use App\Models\Post;
+use App\Models\ProfileView;
 
 function get_user()
 {
@@ -112,14 +113,14 @@ function artist_lost_fans_count($user_id, $start_date, $end_date)
 }
 function artist_profile_impression_count($user_id, $start_date, $end_date)
 {
-    $impression=ActivityLog::where('artist_id', $user_id)
-        ->where('activity_type', 'Profile Views')
+    $profile=ProfileView::where('user_id', $user_id)
+        
         ->whereDate('created_at', '>=', $start_date)
         ->whereDate('created_at', '<=', $end_date)
-        ->get('profile_impressions')
-        ->first();
+        ->select('profile_view')
+        ->get()->count();
     if (!empty($impression)) {
-        $widget_data['Total Profile Impressions']= $impression['profile_impressions'];
+        $widget_data['Total Profile Impressions']= $profile;
     } else {
         $widget_data['Total Profile Impressions']=0;
     }

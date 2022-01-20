@@ -48,6 +48,9 @@ Route::group([
         /********************** Like ************ */
         Route::post('like', [CommentController::class, 'add_like']);
 
+          /********************** Profile View ************ */
+          Route::post('profile_view', [CommentController::class, 'profile_views']);
+
         /***************** Payment ************* */
         Route::post('payment', [PaymentController::class, 'stripe']);
         Route::put('payment', [PaymentController::class, 'update']);
@@ -88,11 +91,11 @@ Route::group([
         'middleware' => ['auth:api', 'artist']
     ], function () {
 
-        Route::get('artist/post', [PostController::class, 'list']);
-
         Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
 
-        
+        Route::get('artist/post', [PostController::class, 'list']);
+
+     
         Route::get('artist/logout', [AuthController::class, 'logout']);
 
         /********************** Setup profile ************ */
@@ -138,10 +141,13 @@ Route::group([
 
         Route::post('artist/promotion', [SubscriptionController::class, 'promotion_add']);
         /*******************  Dashboard  ****************** */
-        Route::get('artist/dashboard', [DashboardController::class, 'dashboard_statistcs']);
-        Route::get('artist/views', [DashboardController::class, 'profile_views']);
-        Route::get('artist/fans', [DashboardController::class, 'fans']);
-        Route::get('artist/earnings', [DashboardController::class, 'earnings']);
+
+        Route::get('artist_dashboard', [DashboardController::class, 'dashboard_statistcs']);
+     
+        Route::get('artist_dashboard/fans', [DashboardController::class, 'fans']);
+        Route::get('artist_dashboard/earnings', [DashboardController::class, 'earnings']);
+
+        Route::get('artist_dashboard/views', [DashboardController::class, 'profile_views']);
     });
 });
 

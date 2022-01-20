@@ -414,7 +414,7 @@ class ArtistController extends Controller
 
         ActivityLog::updateOrCreate(
             ['artist_id'=> $artist_id,
-            'activity_type'=> "Profile Views"
+            'activity_type'=> "Impression"
            ],
             [
            'profile_impressions'=> DB::raw('profile_impressions+1'),
@@ -514,6 +514,35 @@ class ArtistController extends Controller
               'status_code' => $status_code
           ], $status_code);
     }
+
+      /* fetch Artist */
+      public function tag(Request $request, $artist_id)
+      {
+         $message =  __('user.not_artist');
+         $status_code = BADREQUEST;
+   
+         $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+ 
+         $data= User::withTrashed()->select(
+             'id',
+             'email',
+             'name',
+             'username',
+             'profile_pic',
+             'deleted_at',
+         )->where('id', $artist_id)->where('role_id', $role)->first();
+ 
+         if (isset($data)) {
+             $message = __('user.user_list_success');
+             $status_code = SUCCESSCODE;
+         }
+   
+         return response([
+               'data'        => $data,
+               'message'     => $message,
+               'status_code' => $status_code
+           ], $status_code);
+     }
 
     public function settings(Request $request, $artist_id)
     {
