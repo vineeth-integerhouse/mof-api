@@ -11,4 +11,9 @@ class UserSubscription extends Model
     use HasFactory, SoftDeletes;
 
     public $fillable = ['user_id', 'subscribe_id',  'promotion_id', 'status'];
+
+    public function Subscription()
+    {
+        return $this->belongsTo(Subscription::class);
+    }
 }

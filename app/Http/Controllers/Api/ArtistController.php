@@ -9,6 +9,7 @@ use App\Models\ActivityLog;
 use App\Models\Genre;
 use App\Models\Role;
 use App\Models\SocialProfile;
+use App\Models\Subscription;
 use App\Models\User;
 use App\Rules\StrongPassword;
 use Exception;
@@ -515,34 +516,47 @@ class ArtistController extends Controller
           ], $status_code);
     }
 
-      /* fetch Artist */
-      public function tag(Request $request, $artist_id)
-      {
-         $message =  __('user.not_artist');
-         $status_code = BADREQUEST;
+    //   /* fetch Artist */
+    //   public function tag(Request $request, $artist_id)
+    //   {
+    //      $message =  __('user.not_artist');
+    //      $status_code = BADREQUEST;
+
+    //      $post_comment= Post::with('comment')
+    //      ->where('user_id', $user_id)
+    //      ->whereDate('created_at', '>=', $start_date)
+    //      ->whereDate('created_at', '<=', $end_date)
+    //      ->get()
+    //      ->toArray();
+
+
+    //      Subscription::with ('usersubscription')
+    //      ->
    
-         $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+    //      $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+
+         
  
-         $data= User::withTrashed()->select(
-             'id',
-             'email',
-             'name',
-             'username',
-             'profile_pic',
-             'deleted_at',
-         )->where('id', $artist_id)->where('role_id', $role)->first();
+    //      $data= User::withTrashed()->select(
+    //          'id',
+    //          'email',
+    //          'name',
+    //          'username',
+    //          'profile_pic',
+    //          'deleted_at',
+    //      )->where('id', $artist_id)->where('role_id', $role)->first();
  
-         if (isset($data)) {
-             $message = __('user.user_list_success');
-             $status_code = SUCCESSCODE;
-         }
+    //      if (isset($data)) {
+    //          $message = __('user.user_list_success');
+    //          $status_code = SUCCESSCODE;
+    //      }
    
-         return response([
-               'data'        => $data,
-               'message'     => $message,
-               'status_code' => $status_code
-           ], $status_code);
-     }
+    //      return response([
+    //            'data'        => $data,
+    //            'message'     => $message,
+    //            'status_code' => $status_code
+    //        ], $status_code);
+    //  }
 
     public function settings(Request $request, $artist_id)
     {
