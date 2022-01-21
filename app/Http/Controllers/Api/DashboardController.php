@@ -14,6 +14,7 @@ use App\Models\Subscription;
 use App\Models\User;
 use App\Models\UserSubscription;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -499,20 +500,23 @@ class DashboardController extends Controller
         } elseif ($request->input('filter_option') == 'last_7days') {
             $start_date = date('Y-m-d', strtotime('-7 days'));
             $end_date = date('Y-m-d');
+
           
-            $profile=ProfileView::where('user_id', $current_user->id)
+            $profile=ProfileView::select(
+                        DB::raw("(count(*)) as total"),
+                        DB::raw("(MAX(DATE_FORMAT(created_at, '%W'))) as day"),
+                        DB::raw("(DATE_FORMAT(created_at, '%d-%m-%Y')) as created_at")
+                    )   ->where('user_id', $current_user->id)
                         ->whereDate('created_at', '>=', $start_date)
                         ->whereDate('created_at', '<=', $end_date)
-                        ->groupBy('created_at')
-                        ->selectRaw('count(*) as total, created_at')
-                        ->get()->toArray();
+                        ->groupBy(DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y')"))
+                    ->get()->toArray();
 
-    if (!empty($profile)) {
-        $widget_data['Total Profile Impressions']= $profile;
-    } else {
-        $widget_data['Total Profile Impressions']=0;
-    }
-
+            if (!empty($profile)) {
+                $widget_data['Total Profile Impressions']= $profile;
+            } else {
+                $widget_data['Total Profile Impressions']=0;
+            }
         } elseif ($request->input('filter_option') == 'this_month') {
             $year = date('Y');
             $month = date('m');
@@ -531,10 +535,15 @@ class DashboardController extends Controller
         } elseif ($request->input('filter_option') == 'this_year') {
             $year = date('Y');
         
-            $profile_views= ProfileView::whereYear('created_at', '=', $year)
-                             ->where('user_id', $current_user->id)
-                             ->select('profile_view')
-                            ->get()->count();
+            $profile_views= ProfileView::select(
+                                    DB::raw("(count(*)) as total"),
+                                    DB::raw("(MAX(DATE_FORMAT(created_at, '%M'))) as month"),
+                                    DB::raw("(DATE_FORMAT(created_at, '%m')) as created_at"),
+                                    ) 
+                                    ->whereYear('created_at', '=', $year)
+                                    ->where('user_id', $current_user->id)
+                                    ->groupBy(DB::raw("DATE_FORMAT(created_at, '%m')"))
+                                    ->get()->toArray();
 
             if (!empty($profile_views)) {
                 $widget_data['Profile Views']= $profile_views;
@@ -599,30 +608,37 @@ class DashboardController extends Controller
             $start_date = date('Y-m-d', strtotime('-7 days'));
             $end_date = date('Y-m-d');
 
-            $subscription= Subscription::where('user_id', $current_user->id,)->get()->toArray();
+            $subscription= Subscription::where('user_id', $current_user->id, )->get()->toArray();
             $count_of_fans=0;
-            $count_of_lost_fans=0;
             foreach ($subscription as $type) {
-                $count_of_fans= UserSubscription::where('status', '1')
-                ->where('subscribe_id', $type['id'])
-                ->whereDate('created_at', '>=', $start_date)
-                ->whereDate('created_at', '<=', $end_date)
-                ->groupBy('created_at')
-                ->selectRaw('count(*) as total, created_at')
-                ->get();
+                $count_of_fans= UserSubscription::select(
+                                    DB::raw("(count(*)) as total"),
+                                    DB::raw("(MAX(DATE_FORMAT(created_at, '%W'))) as day"),
+                                    DB::raw("(DATE_FORMAT(created_at, '%d-%m-%Y')) as created_at")
+                                    )
+                                    ->where('status', '1')
+                                    ->where('subscribe_id', $type['id'])
+                                    ->whereDate('created_at', '>=', $start_date)
+                                    ->whereDate('created_at', '<=', $end_date)
+                                    ->groupBy(DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y')"))
+                                    ->get();
             }
 
             $subscription= Subscription::where('user_id', $current_user->id)->get()->toArray();
             $count_of_lost_fans=0;
             foreach ($subscription as $type) {
-                $count_of_lost_fans= UserSubscription::where('status', '0')
-                    ->where('subscribe_id', $type['id'])
-                    ->whereDate('created_at', '>=', $start_date)
-                    ->whereDate('created_at', '<=', $end_date)
-                    ->groupBy('created_at')
-                    ->selectRaw('count(*) as total, created_at')
-                    ->get();
-                }
+                $count_of_lost_fans= UserSubscription::select(
+                                        DB::raw("(count(*)) as total"),
+                                        DB::raw("(MAX(DATE_FORMAT(created_at, '%W'))) as day"),
+                                        DB::raw("(DATE_FORMAT(created_at, '%d-%m-%Y')) as created_at")
+                                        )
+                                        ->where('status', '0')
+                                        ->where('subscribe_id', $type['id'])
+                                        ->whereDate('created_at', '>=', $start_date)
+                                        ->whereDate('created_at', '<=', $end_date)
+                                        ->groupBy(DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y')"))
+                                        ->get();
+            }
         
             $widget_data['Fans']=  $count_of_fans;
             $widget_data['Lost Fans']=  $count_of_lost_fans;
@@ -652,18 +668,30 @@ class DashboardController extends Controller
             $year = date('Y');
 
             $subscription= Subscription::where('user_id', $current_user->id)->get()->toArray();
-
+ 
             $count_of_fans=0;
             $count_of_lost_fans=0;
             foreach ($subscription as $type) {
-                $count_of_fans+= UserSubscription::where('status', '1')
-                                 ->where('subscribe_id', $type['id'])
-                                 ->whereYear('created_at', '=', $year)
-                                 ->count();
-                $count_of_lost_fans+= UserSubscription::where('status', '0')
-                                  ->where('subscribe_id', $type['id'])
-                                  ->whereYear('created_at', '=', $year)
-                                  ->count();
+                $count_of_fans= UserSubscription::select(
+                                        DB::raw("(count(*)) as total"),
+                                        DB::raw("(MAX(DATE_FORMAT(created_at, '%M'))) as month"),
+                                        DB::raw("(DATE_FORMAT(created_at, '%m')) as created_at"),
+                                        ) 
+                                        ->where('status', '1')
+                                        ->where('subscribe_id', $type['id'])
+                                        ->whereYear('created_at', '=', $year)
+                                        ->groupBy(DB::raw("DATE_FORMAT(created_at, '%m')"))
+                                        ->get();
+                $count_of_lost_fans= UserSubscription::select(
+                                            DB::raw("(count(*)) as total"),
+                                            DB::raw("(MAX(DATE_FORMAT(created_at, '%M'))) as month"),
+                                            DB::raw("(DATE_FORMAT(created_at, '%m')) as created_at"),
+                                            ) 
+                                            ->where('status', '0')
+                                            ->where('subscribe_id', $type['id'])
+                                            ->whereYear('created_at', '=', $year)
+                                            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%m')"))
+                                           ->get();
             }
             $widget_data['Fans']=  $count_of_fans;
             $widget_data['Lost Fans']=  $count_of_lost_fans;
@@ -714,41 +742,49 @@ class DashboardController extends Controller
             ->where('status', 'Paid')
             ->get()->sum('amount');
         } elseif ($request->input('filter_option') == 'last_7days') {
+
             $start_date = date('Y-m-d', strtotime('-7 days'));
             $end_date = date('Y-m-d');
 
-            $widget_data['Total Earned'] = Payment::select('amount')
-            ->where('payee', $current_user->id) 
-            ->where('payin_payout', 'Payouts')
-            ->where('status', 'Paid')
-            ->whereDate('created_at', '>=', $start_date)
-            ->whereDate('created_at', '<=', $end_date)
-            ->get()
-            ->sum('amount');
-            
-          
-
-           // $widget_data['Total Earned'] = artist_earnings_count($current_user->id, $start_date, $end_date);
+            $widget_data['Total Earned'] = Payment::select(
+                                                DB::raw("(sum(amount)) as total"),
+                                                DB::raw("(MAX(DATE_FORMAT(created_at, '%W'))) as day"),
+                                                DB::raw("(DATE_FORMAT(created_at, '%d-%m-%Y')) as created_at")
+                                                )
+                                                ->where('payee', $current_user->id)
+                                                ->where('payin_payout', 'Payouts')
+                                                ->where('status', 'Paid')
+                                                ->whereDate('created_at', '>=', $start_date)
+                                                ->whereDate('created_at', '<=', $end_date)
+                                                ->whereDate('created_at', '<=', $end_date)
+                                                ->groupBy(DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y')"))
+                                                ->get()->toArray();
+                  
         } elseif ($request->input('filter_option') == 'this_month') {
             $year = date('Y');
             $month = date('m');
 
             $widget_data['Total Earned'] = Payment::select('amount')
-            ->where('payee', $current_user->id)
-            ->where('payin_payout', 'Payouts')
-            ->where('status', 'Paid')
-            ->whereYear('created_at', '=', $year)
-            ->whereMonth('created_at', '=', $month)
-            ->get()->sum('amount');
+                                                    ->where('payee', $current_user->id)
+                                                    ->where('payin_payout', 'Payouts')
+                                                    ->where('status', 'Paid')
+                                                    ->whereYear('created_at', '=', $year)
+                                                    ->whereMonth('created_at', '=', $month)
+                                                    ->get()->sum('amount');
         } elseif ($request->input('filter_option') == 'this_year') {
             $year = date('Y');
 
-            $widget_data['Total Earned'] = Payment::select('amount')
-            ->where('payee', $current_user->id)
-            ->where('payin_payout', 'Payouts')
-            ->where('status', 'Paid')
-            ->whereYear('created_at', '=', $year)
-            ->get()->sum('amount');
+            $widget_data['Total Earned'] = Payment::select(
+                                                DB::raw("(sum(amount)) as total"),
+                                                DB::raw("(MAX(DATE_FORMAT(created_at, '%M'))) as day"),
+                                                DB::raw("(DATE_FORMAT(created_at, '%m')) as created_at")
+                                                )
+                                                ->where('payee', $current_user->id)
+                                                ->where('payin_payout', 'Payouts')
+                                                ->where('status', 'Paid')
+                                                ->whereYear('created_at', '=', $year)
+                                                ->groupBy(DB::raw("DATE_FORMAT(created_at, '%m')"))
+                                                ->get()->toArray();
         } elseif ($request->input('filter_option') == 'choose_date') {
             $start_date = $request->start_date;
             $end_date = $request->end_date;

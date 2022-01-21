@@ -91,11 +91,11 @@ Route::group([
         'middleware' => ['auth:api', 'artist']
     ], function () {
 
+        Route::get('artist/post', [PostController::class, 'list']);
+        
         Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
 
-        Route::get('artist/post', [PostController::class, 'list']);
-
-     
+    
         Route::get('artist/logout', [AuthController::class, 'logout']);
 
         /********************** Setup profile ************ */
