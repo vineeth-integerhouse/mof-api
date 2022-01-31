@@ -92,6 +92,8 @@ Route::group([
     ], function () {
 
         Route::get('artist/post', [PostController::class, 'list']);
+
+        Route::get('artist_tag/{artist_id}  ', [ArtistController::class, 'tag']);
         
         Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
 

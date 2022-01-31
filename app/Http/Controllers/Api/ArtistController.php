@@ -11,13 +11,13 @@ use App\Models\Role;
 use App\Models\SocialProfile;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Models\UserSubscription;
 use App\Rules\StrongPassword;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
-
 
 class ArtistController extends Controller
 {
@@ -218,7 +218,7 @@ class ArtistController extends Controller
         $message = __('user.update_failed');
         $status_code = BADREQUEST;
 
-        $user = User::find($request->id); 
+        $user = User::find($request->id);
 
         if ($user) {
             try {
@@ -291,7 +291,7 @@ class ArtistController extends Controller
         $message = __('user.update_failed');
         $status_code = BADREQUEST;
 
-        $user = User::find($request->id); 
+        $user = User::find($request->id);
 
         if ($user) {
             try {
@@ -319,7 +319,7 @@ class ArtistController extends Controller
         
                 $update['updated_at'] = date("Y-m-d H:i:s");
                 if (count($update) != 0) {
-                    DB::table('users')->where('id',$request->id)->update($update);
+                    DB::table('users')->where('id', $request->id)->update($update);
                 }
                 $message = __('user.email');
                 $status_code = SUCCESSCODE;
@@ -487,9 +487,9 @@ class ArtistController extends Controller
         ], $status_code);
     }
 
-     /* fetch Artist */
-     public function admin_fetch(Request $request, $artist_id)
-     {
+    /* fetch Artist */
+    public function admin_fetch(Request $request, $artist_id)
+    {
         $message =  __('user.not_artist');
         $status_code = BADREQUEST;
   
@@ -516,47 +516,44 @@ class ArtistController extends Controller
           ], $status_code);
     }
 
-    //   /* fetch Artist */
-    //   public function tag(Request $request, $artist_id)
-    //   {
-    //      $message =  __('user.not_artist');
-    //      $status_code = BADREQUEST;
+    /* fetch Artist */
+    public function tag(Request $request, $artist_id)
+    {
+        $message =  'Fialed to fetch tagged users';
+        $status_code = BADREQUEST;
 
-    //      $post_comment= Post::with('comment')
-    //      ->where('user_id', $user_id)
-    //      ->whereDate('created_at', '>=', $start_date)
-    //      ->whereDate('created_at', '<=', $end_date)
-    //      ->get()
-    //      ->toArray();
+    
 
+        $subscription = Subscription::select('id', 'user_id')
+                            ->where('user_id', $artist_id)
+                            ->get()->toArray();
 
-    //      Subscription::with ('usersubscription')
-    //      ->
-   
-    //      $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
-
-         
+        foreach ($subscription as $type) {
+            $user_subscription= UserSubscription::select('user_id')
+                                    ->where('status', '1')
+                                    ->where('subscribe_id', $type['id'])
+                                    ->get();
+        }
  
-    //      $data= User::withTrashed()->select(
-    //          'id',
-    //          'email',
-    //          'name',
-    //          'username',
-    //          'profile_pic',
-    //          'deleted_at',
-    //      )->where('id', $artist_id)->where('role_id', $role)->first();
- 
-    //      if (isset($data)) {
-    //          $message = __('user.user_list_success');
-    //          $status_code = SUCCESSCODE;
-    //      }
+        $users=[];
+        foreach ($user_subscription as $type) {
+           
+           array_push($users, User::select('id', 'name')
+                     ->where('id', $type['user_id'])
+                    ->first());             
+         }
+
+        if (isset($users)) {
+            $message = 'Tagged Users';
+            $status_code = SUCCESSCODE;
+        }
    
-    //      return response([
-    //            'data'        => $data,
-    //            'message'     => $message,
-    //            'status_code' => $status_code
-    //        ], $status_code);
-    //  }
+        return response([
+               'data'        => $users,
+               'message'     => $message,
+               'status_code' => $status_code
+           ], $status_code);
+    }
 
     public function settings(Request $request, $artist_id)
     {

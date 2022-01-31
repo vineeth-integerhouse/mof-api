@@ -608,7 +608,7 @@ class DashboardController extends Controller
             $start_date = date('Y-m-d', strtotime('-7 days'));
             $end_date = date('Y-m-d');
 
-            $subscription= Subscription::where('user_id', $current_user->id, )->get()->toArray();
+            $subscription= Subscription::where('user_id', $current_user->id)->get()->toArray();
             $count_of_fans=0;
             foreach ($subscription as $type) {
                 $count_of_fans= UserSubscription::select(
