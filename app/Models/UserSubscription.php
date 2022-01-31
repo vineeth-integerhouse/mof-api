@@ -12,7 +12,7 @@ class UserSubscription extends Model
 
     public $fillable = ['user_id', 'subscribe_id',  'promotion_id', 'status'];
 
-    public function Subscription()
+    public function subscriptions()
     {
         return $this->belongsTo(Subscription::class);
     }
