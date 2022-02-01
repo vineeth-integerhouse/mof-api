@@ -107,8 +107,8 @@ Route::group([
         /********************** Settings ************ */
 
         Route::get('artist/{artist_id}/settings', [ArtistController::class, 'settings']);
-        Route::put('artist/password', [ArtistController::class, 'update_password']);
-        Route::put('artist/email', [ArtistController::class, 'update_email']);
+        Route::put('artist_password', [ArtistController::class, 'update_password']);
+        Route::put('artist_email', [ArtistController::class, 'update_email']);
 
 
         /********************** Delete account ************ */
@@ -128,7 +128,7 @@ Route::group([
         Route::post('artist/tour', [TourController::class, 'add']);
         Route::put('artist/tour/{tour_id}', [TourController::class, 'update']);
         Route::get('artist/{artist_id}/tour', [TourController::class, 'get']);
-        Route::get('artist/tour', [TourController::class, 'list']);
+        Route::get('artist_tour', [TourController::class, 'list']);
         Route::delete('artist/tour/{tour_id}', [TourController::class, 'delete']);
 
 

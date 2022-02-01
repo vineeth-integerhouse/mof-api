@@ -522,26 +522,27 @@ class ArtistController extends Controller
         $message =  'Fialed to fetch tagged users';
         $status_code = BADREQUEST;
 
-    
-
         $subscription = Subscription::select('id', 'user_id')
                             ->where('user_id', $artist_id)
                             ->get()->toArray();
 
-        foreach ($subscription as $type) {
-            $user_subscription= UserSubscription::select('user_id')
+        if (isset($subscription)) {
+            foreach ($subscription as $type) {
+                $user_subscription= UserSubscription::select('user_id')
                                     ->where('status', '1')
                                     ->where('subscribe_id', $type['id'])
                                     ->get();
+            }
         }
  
         $users=[];
-        foreach ($user_subscription as $type) {
-           
-           array_push($users, User::select('id', 'name')
+        if (isset($user_subscription)) {
+            foreach ($user_subscription as $type) {
+                array_push($users, User::select('id', 'name')
                      ->where('id', $type['user_id'])
-                    ->first());             
-         }
+                    ->first());
+            }
+        }
 
         if (isset($users)) {
             $message = 'Tagged Users';

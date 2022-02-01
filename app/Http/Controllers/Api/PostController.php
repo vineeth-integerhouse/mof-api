@@ -37,21 +37,25 @@ class PostController extends Controller
             break;
 
         case 2:
+            $post_data['title'] = $request->title;
             $post_data['image'] = $request->image;
             $post_data['content'] = $request->content;
             break;
 
         case 3:
+            $post_data['title'] = $request->title;
             $post_data['video'] = $request->video;
             $post_data['content'] = $request->content;
             break;
             
         case 4:
+            $post_data['title'] = $request->title;
             $post_data['audio'] = $request->audio;
             $post_data['content'] = $request->content;
             break;
             
         case 5:
+            $post_data['title'] = $request->title;
             $post_data['live_stream'] = $request->live_stream;
             $post_data['content'] = $request->content;
             break;
