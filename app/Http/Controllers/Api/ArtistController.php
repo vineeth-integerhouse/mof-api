@@ -34,6 +34,9 @@ class ArtistController extends Controller
             if (isset($request->username)) {
                 $update['username'] = $request->username;
             }
+            if (isset($request->name)) {
+                $update['name'] = $request->name;
+            }
             if (isset($request->bio)) {
                 $update['bio'] = $request->bio;
             }
@@ -538,7 +541,7 @@ class ArtistController extends Controller
         $users=[];
         if (isset($user_subscription)) {
             foreach ($user_subscription as $type) {
-                array_push($users, User::select('id', 'name')
+                array_push($users, User::select('id', 'name','profile_pic')
                      ->where('id', $type['user_id'])
                     ->first());
             }

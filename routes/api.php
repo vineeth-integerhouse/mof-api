@@ -133,8 +133,8 @@ Route::group([
 
 
         /*******************  Payments ****************** */
-        Route::get('artist/payment', [PaymentController::class, 'artist_payment_list']);
-        Route::get('artist/payout', [PaymentController::class, 'artist_payout_list']);
+        Route::get('artist_payment', [PaymentController::class, 'artist_payment_list']);
+        Route::get('artist_payout', [PaymentController::class, 'artist_payout_list']);
 
         /*******************  Subscription ****************** */
         Route::post('artist/subscription', [SubscriptionController::class, 'add']);
@@ -189,6 +189,7 @@ Route::group([
         /********************* subscription ************** */
         Route::get('admin/subscription', [SubscriptionController::class, 'admin_list']);
         Route::get('admin/subscription/{subscription_id}', [SubscriptionController::class, 'admin_fetch']);
+        Route::get('admin_usersubscription/{user_id}', [SubscriptionController::class, 'admin_usersubscritpion_fetch']);
     });
 });
 
