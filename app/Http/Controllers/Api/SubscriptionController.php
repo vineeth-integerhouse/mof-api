@@ -332,4 +332,41 @@ class SubscriptionController extends Controller
             'status_code' => $status_code,
         ], $status_code);
     }
+
+    public function admin_usersubscritpion_fetch(Request $request, $user_id)
+    {
+        $data = [];
+        $message = __('user.admin_subscription_failed');
+        $status_code = BADREQUEST;
+
+        $users= UserSubscription::select(
+            'user_subscriptions.id',
+            'user_subscriptions.user_id',
+            'subscribe_id as subscription_id',
+            'subscription_type as subscription',
+            'subscriptions.price',
+            'subscriptions.user_id as artist_id',
+            'user_subscriptions.status',
+            'users.name',
+            'users.username',
+            'promotion_id',
+            'promotions.starts_at',
+            'promotions.expires_at',
+        )->leftJoin('subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
+        ->leftJoin('promotions', 'promotions.id', '=', 'user_subscriptions.promotion_id')
+        ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
+        ->leftJoin('users', 'users.id', '=', 'subscriptions.user_id')
+        ->where('user_subscriptions.deleted_at', null)
+        ->where('user_subscriptions.status', 1)
+        ->where('user_subscriptions.user_id', $user_id)->get();
+
+        $message = __('user.admin_subscription');
+        $status_code = SUCCESSCODE;
+        
+        return response([
+            'data' => $users,
+            'message' => $message,
+            'status_code' => $status_code,
+        ], $status_code);
+    }
 }

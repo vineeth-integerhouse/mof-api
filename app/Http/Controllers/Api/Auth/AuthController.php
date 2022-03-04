@@ -55,6 +55,7 @@ class AuthController extends Controller
                     'email',
                     'role_id',
                     'name',
+                    'username',
                     'profile_pic'
                 )->with('role', function ($query) {
                     $query->select('id', 'role_name');
@@ -117,6 +118,7 @@ class AuthController extends Controller
                     'email',
                     'role_id',
                     'name',
+                    'username',
                     'profile_pic'
                 )->with('role', function ($query) {
                     $query->select('id', 'role_name');
