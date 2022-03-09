@@ -40,6 +40,12 @@ class ArtistController extends Controller
             if (isset($request->bio)) {
                 $update['bio'] = $request->bio;
             }
+            if (isset($request->website)) {
+                $update['website'] = $request->website;
+            }
+            if (isset($request->merchandise_store)) {
+                $update['merchandise_store'] = $request->merchandise_store;
+            }
             if (isset($request->payment_method)) {
                 $update['payment_method'] = $request->payment_method;
             }
@@ -81,6 +87,8 @@ class ArtistController extends Controller
             'email',
             'profile_pic',
             'bio',
+            'website',
+            'merchandise_store',
             'payment_method',
         )->where('id', $artist_id)->get()->first();
 
