@@ -84,7 +84,7 @@ class TourController extends Controller
                 $update['updated_at'] = date("Y-m-d H:i:s");
 
                 if (count($update) != 0) {
-                    DB::table('tours')->where('id', $tour_id)->update($update);
+                    DB::table('tours')->where('id', $tour_id)->where('user_id', $current_user->id)->update($update);
                 }
                 $data= DB::table('tours')
                         ->select(
@@ -171,6 +171,7 @@ class TourController extends Controller
          ], $status_code);
     }
 
+
     /* Delete Tour*/
     public function delete(Request $request, $tour_id)
     {
@@ -199,4 +200,93 @@ class TourController extends Controller
             'status_code' => $status_code
         ], $status_code);
     }
+
+        /* Admin Delete Tour*/
+        public function admin_delete(Request $request, $tour_id, $artist_id)
+        {
+            $data      = [];
+            $message =  __('user.invalid_user');
+            $status_code = BADREQUEST;
+    
+    
+            $tour = Tour::where('id', $tour_id)->first();
+    
+            $tour_data = Tour::where('id', $tour_id)->where('user_id', $artist_id)->delete();
+           
+            if ($tour_data === 1) {
+                $data['id']   = $tour->id;
+                $message = __('user.tour_delete_success');
+                $status_code = SUCCESSCODE;
+            } else {
+                $message = __('user.tour_delete_failed');
+                $status_code = BADREQUEST;
+            }
+        
+            return response([
+                'data'        => $data,
+                'message'     => $message,
+                'status_code' => $status_code
+            ], $status_code);
+        }
+
+     /* Admin Edit Tour */
+     public function admin_update(Request $request, $artist_id,$tour_id)
+     {
+         $data = [];
+         $message     =  '';
+         $status_code = '';
+   
+         $tour_data = Tour::find($tour_id);
+ 
+    
+         if ($tour_data) {
+             try {
+                 $update = [];
+                 if (isset($request->date)) {
+                     $update['date'] = $request->date;
+                     ;
+                 }
+                 if (isset($request->time)) {
+                     $update['time'] = date("H:i:s", strtotime($request->time));
+                 }
+                 if (isset($request->venue)) {
+                     $update['venue'] = $request->venue;
+                 }
+                 if (isset($request->city)) {
+                     $update['city'] = $request->city;
+                 }
+                 if (isset($request->ticket_link)) {
+                     $update['ticket_link'] = $request->ticket_link;
+                 }
+ 
+                 $update['updated_at'] = date("Y-m-d H:i:s");
+ 
+                 if (count($update) != 0) {
+                     DB::table('tours')->where('id', $tour_id)->where('user_id',$artist_id)->update($update);
+                 }
+                 $data= DB::table('tours')
+                         ->select(
+                             'id',
+                             'date',
+                             DB::raw("DATE_FORMAT(tours.time, '%h:%i %p') as time"),
+                             'venue',
+                             'city',
+                             'ticket_link',
+                             'user_id',
+                         )->where('id', $tour_id)->where('user_id',$artist_id)->get()->first();
+                 $message = __('user.update_success');
+                 $status_code = SUCCESSCODE;
+             } catch (Exception $e) {
+                 $data=[];
+                 $message = __('user.update_failed') . ' ' . $e->getMessage();
+                 $status_code = BADREQUEST;
+             }
+         }
+ 
+         return response([
+              'data'        => $data,
+              'message'     => $message,
+              'status_code' => $status_code
+          ], $status_code);
+     }
 }

@@ -176,6 +176,18 @@ Route::group([
         Route::delete('admin/artist/{artist_id}', [ArtistController::class, 'admin_delete']);
         Route::put('admin/artist/{artist_id}', [ArtistController::class, 'update']);
 
+        Route::put('admin/artist/{artist_id}', [ArtistController::class, 'set_up_profile']);
+
+        Route::get('admin/artist/{artist_id}/tour', [TourController::class, 'get']);
+        Route::put('admin/artist/{artist_id}/tour/{tour_id}', [TourController::class, 'admin_update']);
+        Route::delete('admin/artist/{artist_id}/tour/{tour_id}', [TourController::class, 'admin_delete']);
+
+        Route::get('admin/artist/{artist_id}/subscription', [SubscriptionController::class, 'get']);
+        Route::put('admin/artist/{artist_id}/subscription/{subscription_id}', [SubscriptionController::class, 'update']);
+
+        Route::get('admin/artist/{artist_id}/promotion', [SubscriptionController::class, 'get_promotion']);
+        Route::put('admin/artist/{artist_id}/promotion/{promotion_id}', [SubscriptionController::class, 'update_promotion']);
+
         /********************** Settings ************ */
         Route::put('admin/settings', [AdminController::class, 'settings']);
         Route::get('admin/{admin_id}/settings', [AdminController::class, 'fetch_settings']);
@@ -188,8 +200,11 @@ Route::group([
 
         /********************* subscription ************** */
         Route::get('admin/subscription', [SubscriptionController::class, 'admin_list']);
-        Route::get('admin/subscription/{subscription_id}', [SubscriptionController::class, 'admin_fetch']);
-        Route::get('admin_usersubscription/{user_id}', [SubscriptionController::class, 'admin_usersubscritpion_fetch']);
+         Route::get('admin/user/{user_id}/subscription/{subscription_id}', [SubscriptionController::class, 'admin_fetch']);
+
+        // Route::get('admin/subscription/{subscription_id}', [SubscriptionController::class, 'admin_fetch']);
+
+      Route::get('admin/user/{user_id}/subscription', [SubscriptionController::class, 'admin_usersubscritpion_fetch']);
     });
 });
 
