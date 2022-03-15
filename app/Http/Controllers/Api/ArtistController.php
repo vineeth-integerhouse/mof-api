@@ -512,8 +512,23 @@ class ArtistController extends Controller
             'name',
             'username',
             'profile_pic',
+            'bio',
+            'website',
+            'merchandise_store',
             'deleted_at',
         )->where('id', $artist_id)->where('role_id', $role)->first();
+
+        $data['Social Links']= SocialProfile::select(
+            'id',
+            'social_profile_type_id',
+            'social_profile_username'
+        )->where('user_id', $artist_id)->get();
+
+        $data['Genre']= Genre::select(
+            'id',
+            'genre_type_id',
+        )->where('user_id', $artist_id)->get();
+    
 
         if (isset($data)) {
             $message = __('user.user_list_success');
