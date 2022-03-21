@@ -104,6 +104,8 @@ Route::group([
 
         Route::put('artist/{artist_id}', [ArtistController::class, 'set_up_profile']);
 
+        Route::delete('artist/{artist_id}/soial_profile/{social_id}', [ArtistController::class, 'social_profile_delete']);
+
         /********************** Settings ************ */
 
         Route::get('artist/{artist_id}/settings', [ArtistController::class, 'settings']);
@@ -177,6 +179,8 @@ Route::group([
         Route::put('admin/artist/{artist_id}', [ArtistController::class, 'update']);
 
         Route::put('admin/artist/{artist_id}', [ArtistController::class, 'set_up_profile']);
+
+        Route::delete('admin/artist/{artist_id}/soial_profile/{social_id}', [ArtistController::class, 'social_profile_delete']);
 
         Route::get('admin/artist/{artist_id}/tour', [TourController::class, 'get']);
         Route::put('admin/artist/{artist_id}/tour/{tour_id}', [TourController::class, 'admin_update']);

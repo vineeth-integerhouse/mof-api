@@ -60,9 +60,13 @@ class ArtistController extends Controller
             }
 
             $genre= $request->genre_type_id;
-            for ($i=0;$i<count($genre);$i++) {
-                $genre_data = ['user_id'=>$artist_id, 'genre_type_id' => $request->genre_type_id[$i]];
-                Genre::updateOrCreate($genre_data);
+
+            if (isset($genre)) {
+                Genre::where('user_id', $artist_id)->delete();
+                for ($i=0;$i<count($genre);$i++) {
+                    $genre_data = ['user_id'=>$artist_id, 'genre_type_id' => $request->genre_type_id[$i]];
+                    Genre::updateOrCreate($genre_data);
+                }
             }
     
             $profile_update['social_profile_type_id'] = $request->social_profile_type_id;
@@ -104,6 +108,37 @@ class ArtistController extends Controller
         )->where('user_id', $artist_id)->get();
     
 
+        return response([
+            'data'        => $data,
+            'message'     => $message,
+            'status_code' => $status_code
+        ], $status_code);
+    }
+
+    public function social_profile_delete(Request $request, $artist_id,$social_id)
+    {
+        $user_data = [];
+        $data      = [];
+        $message =  __('user.invalid_user');
+        $status_code = BADREQUEST;
+
+        $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+
+        $user = SocialProfile::where('social_profile_type_id', $social_id)->where('user_id',$artist_id)->first();
+
+        $user_data =  SocialProfile::where('social_profile_type_id', $social_id)->where('user_id',$artist_id)->delete();
+       
+        if ($user_data === 1) {
+            $data['id']   = $user->id;
+            $data['social_profile_type_id'] = $user->social_profile_type_id;
+            $data['user_id'] = $user->user_id;
+            $message = "Deleted social profile";
+            $status_code = SUCCESSCODE;
+        } else {
+            $message = "Failed to delete social profile";
+            $status_code = BADREQUEST;
+        }
+    
         return response([
             'data'        => $data,
             'message'     => $message,

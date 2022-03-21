@@ -202,15 +202,14 @@ class TourController extends Controller
     }
 
         /* Admin Delete Tour*/
-        public function admin_delete(Request $request, $tour_id, $artist_id)
+        public function admin_delete(Request $request, $artist_id, $tour_id)
         {
             $data      = [];
             $message =  __('user.invalid_user');
             $status_code = BADREQUEST;
     
-    
-            $tour = Tour::where('id', $tour_id)->first();
-    
+            $tour = Tour::where('id', $tour_id)->first();    
+          
             $tour_data = Tour::where('id', $tour_id)->where('user_id', $artist_id)->delete();
            
             if ($tour_data === 1) {
