@@ -387,7 +387,7 @@ class SubscriptionController extends Controller
                         'subscription_type_id',
                         'price',
                         'user_id',
-                    )->where('user_id', $artist_id)->get();
+                    )->where('user_id', $artist_id)->first();
      
         if (isset($data)) {
             $message = "Artist subscription";
@@ -414,7 +414,7 @@ class SubscriptionController extends Controller
                      'expires_at',
                      'price',
                      'user_id',
-                 )->where('user_id', $artist_id)->get();
+                 )->where('user_id', $artist_id)->first();
       
         if (isset($data)) {
             $message = "Artist promotion";
