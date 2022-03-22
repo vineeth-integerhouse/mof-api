@@ -91,7 +91,11 @@ Route::group([
         'middleware' => ['auth:api', 'artist']
     ], function () {
 
-        Route::get('artist/post', [PostController::class, 'list']);
+        Route::get('artist/scheduled_post', [PostController::class, 'scheduled_list']);
+        Route::get('artist/saved_post', [PostController::class, 'saved_list']);
+
+        Route::get('artist/publish_post', [PostController::class, 'publish_list']);
+       
 
         Route::get('artist_tag/{artist_id}  ', [ArtistController::class, 'tag']);
         
@@ -105,6 +109,8 @@ Route::group([
         Route::put('artist/{artist_id}', [ArtistController::class, 'set_up_profile']);
 
         Route::delete('artist/{artist_id}/soial_profile/{social_id}', [ArtistController::class, 'social_profile_delete']);
+
+        Route::delete('artist/{artist_id}/genre/{genre_id}', [ArtistController::class, 'genre_delete']);
 
         /********************** Settings ************ */
 
@@ -181,6 +187,8 @@ Route::group([
         Route::put('admin/artist/{artist_id}', [ArtistController::class, 'set_up_profile']);
 
         Route::delete('admin/artist/{artist_id}/soial_profile/{social_id}', [ArtistController::class, 'social_profile_delete']);
+
+        Route::delete('admin/artist/{artist_id}/genre/{genre_id}', [ArtistController::class, 'genre_delete']);
 
         Route::get('admin/artist/{artist_id}/tour', [TourController::class, 'get']);
         Route::put('admin/artist/{artist_id}/tour/{tour_id}', [TourController::class, 'admin_update']);
