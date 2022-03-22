@@ -59,16 +59,12 @@ class ArtistController extends Controller
                 DB::table('users')->where('id', $artist_id)->where('role_id', $role)->update($update);
             }
 
-            $genre= $request->genre_type_id;
-
-            if (isset($genre)) {
-                Genre::where('user_id', $artist_id)->delete();
-                for ($i=0;$i<count($genre);$i++) {
-                    $genre_data = ['user_id'=>$artist_id, 'genre_type_id' => $request->genre_type_id[$i]];
-                    Genre::updateOrCreate($genre_data);
-                }
+            $genre= $request->genre_type_id;   
+            for ($i=0;$i<count($genre);$i++) {
+                $genre_data = ['user_id'=>$artist_id, 'genre_type_id' => $request->genre_type_id[$i]];
+                Genre::updateOrCreate($genre_data);
             }
-    
+            
             $profile_update['social_profile_type_id'] = $request->social_profile_type_id;
             $profile_update['social_profile_username'] = $request->social_profile_username;
             $profile_update['user_id']=$artist_id;
@@ -115,18 +111,16 @@ class ArtistController extends Controller
         ], $status_code);
     }
 
-    public function social_profile_delete(Request $request, $artist_id,$social_id)
+    public function social_profile_delete(Request $request, $artist_id, $social_id)
     {
         $user_data = [];
         $data      = [];
         $message =  __('user.invalid_user');
         $status_code = BADREQUEST;
 
-        $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+        $user = SocialProfile::where('social_profile_type_id', $social_id)->where('user_id', $artist_id)->first();
 
-        $user = SocialProfile::where('social_profile_type_id', $social_id)->where('user_id',$artist_id)->first();
-
-        $user_data =  SocialProfile::where('social_profile_type_id', $social_id)->where('user_id',$artist_id)->delete();
+        $user_data =  SocialProfile::where('social_profile_type_id', $social_id)->where('user_id', $artist_id)->delete();
        
         if ($user_data === 1) {
             $data['id']   = $user->id;
@@ -136,6 +130,35 @@ class ArtistController extends Controller
             $status_code = SUCCESSCODE;
         } else {
             $message = "Failed to delete social profile";
+            $status_code = BADREQUEST;
+        }
+    
+        return response([
+            'data'        => $data,
+            'message'     => $message,
+            'status_code' => $status_code
+        ], $status_code);
+    }
+
+    public function genre_delete(Request $request, $artist_id, $genre_id)
+    {
+        $user_data = [];
+        $data      = [];
+        $message =  __('user.invalid_user');
+        $status_code = BADREQUEST;
+
+        $user = Genre::where('genre_type_id', $genre_id)->where('user_id', $artist_id)->first();
+
+        $user_data =  Genre::where('genre_type_id', $genre_id)->where('user_id', $artist_id)->delete();
+       
+        if ($user_data === 1) {
+            $data['id']   = $user->id;
+            $data['genre_type_id'] = $user->genre_type_id;
+            $data['user_id'] = $user->user_id;
+            $message = "Deleted genre";
+            $status_code = SUCCESSCODE;
+        } else {
+            $message = "Failed to delete genre";
             $status_code = BADREQUEST;
         }
     
@@ -599,7 +622,7 @@ class ArtistController extends Controller
         $users=[];
         if (isset($user_subscription)) {
             foreach ($user_subscription as $type) {
-                array_push($users, User::select('id', 'name','profile_pic')
+                array_push($users, User::select('id', 'name', 'profile_pic')
                      ->where('id', $type['user_id'])
                     ->first());
             }

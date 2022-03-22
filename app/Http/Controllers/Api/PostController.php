@@ -238,19 +238,13 @@ class PostController extends Controller
 
     /* List Post */
      
-    public function list(Request $request)
+    public function publish_list(Request $request)
     {
         $data = [];
         $message = __('user.post_fetch failed');
         $status_code = BADREQUEST;
- 
- 
-        $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
-        $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
-        $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
- 
-        $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
-        $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+
+        $current_user = get_user();
  
         $post = Post::select(
             'id',
@@ -264,11 +258,84 @@ class PostController extends Controller
             'user_id',
             'who_can_see_post_id',
             'post_type_id',
-        )->where('when_to_post_id', '!=', '2')
-        ->orderBy(DB::raw('posts.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+        )->where('when_to_post_id', '=', '1')
+        ->where('user_id', $current_user->id)->get();
  
         if (isset($post)) {
             $message = __('user.post_fetch_success');
+            $status_code = SUCCESSCODE;
+            $data = $post;
+        }
+        return response([
+             'data' => $data,
+             'message' => $message,
+             'status_code' => $status_code
+         ], $status_code);
+    }
+
+    public function scheduled_list(Request $request)
+    {
+
+        $data = [];
+        $message = __('user.post_fetch failed');
+        $status_code = BADREQUEST;
+
+        $current_user = get_user();
+
+        $post = Post::select(
+            'id',
+            'title',
+            'content',
+            'image',
+            'video',
+            'audio',
+            'live_stream',
+            'when_to_post_id',
+            'user_id',
+            'who_can_see_post_id',
+            'post_type_id',
+            'time',
+            'date'
+        )->where('when_to_post_id', '=', '2')->where('user_id', $current_user->id)->get();
+      
+ 
+        if (isset($post)) {
+            $message = "Scheduled Post";
+            $status_code = SUCCESSCODE;
+            $data = $post;
+        }
+        return response([
+             'data' => $data,
+             'message' => $message,
+             'status_code' => $status_code
+         ], $status_code);
+    }
+
+    public function saved_list(Request $request)
+    {  
+        $data = [];
+        $message = __('user.post_fetch failed');
+        $status_code = BADREQUEST;
+ 
+        $current_user = get_user();
+        
+        $post = Post::select(
+            'id',
+            'title',
+            'content',
+            'image',
+            'video',
+            'audio',
+            'live_stream',
+            'when_to_post_id',
+            'user_id',
+            'who_can_see_post_id',
+            'post_type_id',
+        )->where('when_to_post_id', '=', '3')
+        ->where('user_id', $current_user->id)->get();
+ 
+        if (isset($post)) {
+            $message = "Saved Post";
             $status_code = SUCCESSCODE;
             $data = $post;
         }
