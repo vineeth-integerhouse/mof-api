@@ -56,6 +56,18 @@ class User extends Authenticatable
         return $this->hasMany(ProfileView::class);
     }
 
+    public function user_subscription()
+    {
+        return $this->hasMany(UserSubscription::class);
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class);
+    }
+
+
+
 
     public static function active_admin_list($user_role, $request)
     {

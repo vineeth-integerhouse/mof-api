@@ -654,7 +654,10 @@ class ArtistController extends Controller
             'email',
             'profile_pic',
             'bio',
+            'website',
+            'merchandise_store',
             'payment_method',
+
         )->where('id', $artist_id)->where('role_id', $role)->get()->first();
 
         $data['Social Links']= SocialProfile::select(

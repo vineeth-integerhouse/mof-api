@@ -39,6 +39,13 @@ Route::group([
       
         Route::put('user', [UserController::class, 'set_up_account']);
 
+        Route::get('user/artists', [UserController::class, 'artist_list']);
+        Route::get('user/artist/{artist_id}', [ArtistController::class, 'settings']);
+
+        Route::get('user/artist/{artist_id}/posts', [PostController::class, 'artist_publish_list']);
+
+        Route::get('user/artist/{artist_id}/tours', [TourController::class, 'artist_tours']);
+
         /********************** Comment ************ */
         Route::post('comment', [CommentController::class, 'add']);
         Route::get('post/{post_id}/comment', [CommentController::class, 'fetch']);
@@ -57,6 +64,8 @@ Route::group([
 
         /***************** Upload ************* */
         Route::post('upload', [UploadController::class, 'upload']);
+
+        // Route::get('user_feed', [PostController::class, 'feed']);
          
         /********************** Notification************ */
         Route::post('notification', [NotificationController::class, 'notification_settings']);
@@ -65,11 +74,16 @@ Route::group([
         /********************* subscription ************** */
         Route::post('subscribe', [SubscriptionController::class, 'user_subscription']);
         Route::put('unsubscribe/{subscribe_id}', [SubscriptionController::class, 'unsubscribe']);
-        Route::get('subscribe', [SubscriptionController::class, 'list']);
+        Route::get('user/{user_id}/subscribe', [SubscriptionController::class, 'list']);
 
-        // /********************** fetch profile ************ */
+        Route::get('user/{user_id}/settings', [UserController::class, 'settings']);
+        Route::put('user_password', [ArtistController::class, 'update_password']);
+        Route::put('user_email', [ArtistController::class, 'update_email']);
 
-        // Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
+
+        // // /********************** fetch profile ************ */
+
+        //  Route::get('artist/{artist_id}', [ArtistController::class, 'fetch']);
 
         /* Seeder routes*/
         Route::get('role', [SeedController::class, 'role']);
@@ -190,6 +204,7 @@ Route::group([
 
         Route::delete('admin/artist/{artist_id}/genre/{genre_id}', [ArtistController::class, 'genre_delete']);
 
+        Route::post('admin/artist/{artist_id}/tour', [TourController::class, 'admin_add']);
         Route::get('admin/artist/{artist_id}/tour', [TourController::class, 'get']);
         Route::put('admin/artist/{artist_id}/tour/{tour_id}', [TourController::class, 'admin_update']);
         Route::delete('admin/artist/{artist_id}/tour/{tour_id}', [TourController::class, 'admin_delete']);
