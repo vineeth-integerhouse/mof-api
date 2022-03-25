@@ -250,4 +250,58 @@ class UserController extends Controller
             'status_code' => $status_code
         ], $status_code);
     }
+
+     /* fetch User */
+     public function artist_list(Request $request)
+     {
+         $data      = [];
+         $message = "Failed to fetch artist list";
+         $status_code = BADREQUEST;
+ 
+         $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+         $data= User::select(
+             'id',
+             'name',
+             'username',
+             'profile_pic',
+         )->where('role_id', $role)->get();
+         if (isset($data)) {
+             $message = "Artist List";
+             $status_code = SUCCESSCODE;
+         }
+     
+         return response([
+             'data'        => $data,
+             'message'     => $message,
+             'status_code' => $status_code
+         ], $status_code);
+     }
+
+     public function settings(Request $request, $user_id)
+    {
+        $message =  "Failed to fetech user";
+        $status_code = BADREQUEST;
+
+
+        $data['User']= User::select(
+            'id',
+            'name',
+            'username',
+            'email',
+            'profile_pic',
+            'bio',
+            'payment_method',
+        )->where('id', $user_id)->get()->first();
+
+        if (isset($data)) {
+            $message = "User Details";
+            $status_code = SUCCESSCODE;
+        }
+  
+        return response([
+              'data'        => $data,
+              'message'     => $message,
+              'status_code' => $status_code
+          ], $status_code);
+    }
 }

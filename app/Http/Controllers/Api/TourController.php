@@ -288,4 +288,71 @@ class TourController extends Controller
               'status_code' => $status_code
           ], $status_code);
      }
+
+     public function admin_add(Request $request,$artist_id)
+    {
+        $data = [];
+      
+        $message = __('user.add_tour_failed');
+        $status_code = BADREQUEST;
+
+        $current_user = get_user();
+  
+        $data['date'] = $request->date;
+        $data['time'] = date("H:i:s", strtotime($request->time));
+        $data['venue'] = $request->venue;
+        $data['city'] = $request->city;
+        $data['ticket_link'] = $request->ticket_link;
+        $data['user_id'] = $artist_id;
+           
+        $inserted_data = Tour::create($data);
+
+        $tour= DB::table('tours')
+        ->select(
+            'id',
+            'date',
+            DB::raw("DATE_FORMAT(tours.time, '%h:%i %p') as time"),
+            'venue',
+            'city',
+            'ticket_link',
+            'user_id',
+        )->where('id', $inserted_data->id)->get()->first();
+        $message = __('user.add_tour_success');
+        $status_code = SUCCESSCODE;
+         
+        return response([
+           'data' => $tour,
+           'message' => $message,
+           'status_code' => $status_code,
+       ], $status_code);
+    }
+
+     /* Fetch Tour*/
+     public function artist_tours(Request $request, $artist_id)
+     {
+         $message =  "Failed to fetch artist tours";
+         $status_code = BADREQUEST;
+  
+         $data= DB::table('tours')
+          ->select(
+              'id',
+              'date',
+              DB::raw("DATE_FORMAT(tours.time, '%h:%i %p') as time"),
+              'venue',
+              'city',
+              'ticket_link',
+              'deleted_at'
+          )->where('user_id', $artist_id)->get();
+  
+         if (isset($data)) {
+             $message = "Artist tours";
+             $status_code = SUCCESSCODE;
+         }
+  
+         return response([
+              'data'        => $data,
+              'message'     => $message,
+              'status_code' => $status_code
+          ], $status_code);
+     }
 }

@@ -160,19 +160,11 @@ class SubscriptionController extends Controller
 
     // Lisitng users subscription
 
-    public function list(Request $request)
+    public function list(Request $request, $user_id)
     {
         $data = [];
         $message = __('user.user_subscription_failed');
         $status_code = BADREQUEST;
-
-        $current_user = get_user();
-        $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
-        $sort_column = !empty($request->input('sort_column')) ? $request->input('sort_column') : "created_at";
-        $sort_direction = !empty($request->input('sort_direction')) ? $request->input('sort_direction')  : "desc";
- 
-        $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
-        $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
 
         $users= UserSubscription::select(
             'user_subscriptions.id',
@@ -191,10 +183,10 @@ class SubscriptionController extends Controller
                     ->leftJoin('promotions', 'promotions.id', '=', 'user_subscriptions.promotion_id')
                     ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
                     ->leftJoin('users', 'users.id', '=', 'subscriptions.user_id')
-                    ->where('user_subscriptions.user_id', $current_user->id)
+                    ->where('user_subscriptions.user_id', $user_id)
                     ->where('user_subscriptions.deleted_at', null)
                     ->where('user_subscriptions.status', 1)
-                    ->orderBy(DB::raw('user_subscriptions.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+                  ->get();
         $message = __('user.user_subscription');
         $status_code = SUCCESSCODE;
         
