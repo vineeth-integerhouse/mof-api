@@ -40,7 +40,7 @@ Route::group([
         Route::put('user', [UserController::class, 'set_up_account']);
 
         Route::get('user/artists', [UserController::class, 'artist_list']);
-        Route::get('user/artist/{artist_id}', [ArtistController::class, 'settings']);
+        Route::get('user/artist/{artist_id}', [ArtistController::class, 'user_artist']);
 
         Route::get('user/artist/{artist_id}/posts', [PostController::class, 'artist_publish_list']);
 
@@ -65,7 +65,7 @@ Route::group([
         /***************** Upload ************* */
         Route::post('upload', [UploadController::class, 'upload']);
 
-        // Route::get('user_feed', [PostController::class, 'feed']);
+        Route::get('user_feed', [PostController::class, 'feed']);
          
         /********************** Notification************ */
         Route::post('notification', [NotificationController::class, 'notification_settings']);
