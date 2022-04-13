@@ -51,6 +51,8 @@ Route::group([
         Route::get('post/{post_id}/comment', [CommentController::class, 'fetch']);
         Route::delete('comment/{comment_id}', [CommentController::class, 'delete']);
 
+        Route::post('comment/{comment_id}/reply', [CommentController::class, 'reply']);
+        Route::get('comment/{comment_id}/reply', [CommentController::class, 'reply_fetch']);
 
         /********************** Like ************ */
         Route::post('like', [CommentController::class, 'add_like']);

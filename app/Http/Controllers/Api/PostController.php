@@ -276,7 +276,8 @@ class PostController extends Controller
             'posts.created_at',
         ) ->leftJoin('users', 'users.id', '=', 'posts.user_id')
         ->where('posts.when_to_post_id', '=', '1')
-        ->where('posts.user_id', $current_user->id)->get();
+        ->where('posts.user_id', $current_user->id)
+        ->orderBy('posts.created_at', 'DESC')->get();
  
         if (isset($post)) {
             $message = __('user.post_fetch_success');
@@ -319,7 +320,8 @@ class PostController extends Controller
             'posts.created_at',
         )->leftJoin('users', 'users.id', '=', 'posts.user_id')
         ->where('posts.when_to_post_id', '=', '2')
-        ->where('posts.user_id', $current_user->id)->get();
+        ->where('posts.user_id', $current_user->id)
+        ->orderBy('posts.created_at', 'DESC')->get();
       
  
         if (isset($post)) {
@@ -363,7 +365,8 @@ class PostController extends Controller
             'posts.created_at',
         )->leftJoin('users', 'users.id', '=', 'posts.user_id')
         ->where('posts.when_to_post_id', '=', '3')
-        ->where('posts.user_id', $current_user->id)->get();
+        ->where('posts.user_id', $current_user->id)
+        ->orderBy('posts.created_at', 'DESC')->get();
  
         if (isset($post)) {
             $message = "Saved Post";
@@ -426,7 +429,8 @@ class PostController extends Controller
             'posts.created_at',
         )->leftJoin('users', 'users.id', '=', 'posts.user_id')
         ->where('posts.when_to_post_id', '=', '1')
-        ->where('posts.user_id', $artist_id)->get();
+        ->where('posts.user_id', $artist_id)
+        ->orderBy('posts.created_at', 'DESC')->get();
  
         if (isset($post)) {
             $message = "Artist Post";

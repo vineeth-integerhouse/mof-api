@@ -59,10 +59,13 @@ class ArtistController extends Controller
                 DB::table('users')->where('id', $artist_id)->where('role_id', $role)->update($update);
             }
 
-            $genre= $request->genre_type_id;   
-            for ($i=0;$i<count($genre);$i++) {
-                $genre_data = ['user_id'=>$artist_id, 'genre_type_id' => $request->genre_type_id[$i]];
-                Genre::updateOrCreate($genre_data);
+            $genre= $request->genre_type_id;
+            
+            if (isset($genre)) {
+                for ($i=0;$i<count($genre);$i++) {
+                    $genre_data = ['user_id'=>$artist_id, 'genre_type_id' => $request->genre_type_id[$i]];
+                    Genre::updateOrCreate($genre_data);
+                }
             }
             
             $profile_update['social_profile_type_id'] = $request->social_profile_type_id;
