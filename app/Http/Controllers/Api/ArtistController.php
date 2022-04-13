@@ -59,10 +59,13 @@ class ArtistController extends Controller
                 DB::table('users')->where('id', $artist_id)->where('role_id', $role)->update($update);
             }
 
-            $genre= $request->genre_type_id;   
-            for ($i=0;$i<count($genre);$i++) {
-                $genre_data = ['user_id'=>$artist_id, 'genre_type_id' => $request->genre_type_id[$i]];
-                Genre::updateOrCreate($genre_data);
+            $genre= $request->genre_type_id;
+            
+            if (isset($genre)) {
+                for ($i=0;$i<count($genre);$i++) {
+                    $genre_data = ['user_id'=>$artist_id, 'genre_type_id' => $request->genre_type_id[$i]];
+                    Genre::updateOrCreate($genre_data);
+                }
             }
             
             $profile_update['social_profile_type_id'] = $request->social_profile_type_id;
@@ -670,6 +673,56 @@ class ArtistController extends Controller
             'id',
             'genre_type_id',
         )->where('user_id', $artist_id)->get();
+
+        if (isset($data)) {
+            $message = __('user.user_list_success');
+            $status_code = SUCCESSCODE;
+        }
+  
+        return response([
+              'data'        => $data,
+              'message'     => $message,
+              'status_code' => $status_code
+          ], $status_code);
+    }
+
+    public function user_artist(Request $request, $artist_id)
+    {
+        $message =  __('user.not_artist');
+        $status_code = BADREQUEST;
+  
+        $role= Role::where('role_name', USER_ROLE_ARTIST)->first()->id;
+
+        $data['User']= User::select(
+                            'id',
+                            'name',
+                            'username',
+                            'email',
+                            'profile_pic',
+                            'bio',
+                            'website',
+                            'merchandise_store',
+                            'payment_method',
+                            )->where('id', $artist_id)
+                            ->where('role_id', $role)->first();
+
+        $data['Social Links']= SocialProfile::select(
+                                    'id',
+                                    'social_profile_type_id',
+                                    'social_profile_username'
+                                    )->where('user_id', $artist_id)->get();
+
+        $data['Genre']= Genre::select(
+                            'id',
+                            'genre_type_id',
+                            )->where('user_id', $artist_id)->get();
+
+        $data['Subscription']= Subscription::select(
+                                    'subscriptions.id',
+                                    'subscriptions.price',
+                                    'subscription_types.subscription_type'
+                                    ) ->leftJoin('subscription_types', 'subscription_types.id', '=', 'subscriptions.subscription_type_id')
+                                    ->where('user_id', $artist_id)->first();
 
         if (isset($data)) {
             $message = __('user.user_list_success');

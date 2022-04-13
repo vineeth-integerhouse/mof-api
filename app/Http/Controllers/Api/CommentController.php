@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Like;
 use App\Models\ProfileView;
+use App\Models\ReplyComment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -49,14 +50,25 @@ class CommentController extends Controller
     {
         $message =  __('user.comment_fetch failed');
         $status_code = BADREQUEST;
+
+        $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
+  
+        $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
+        $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
  
         $data= Comment::select(
-            'id',
-            'post_id',
-            'user_id',
-            'comment'
-        )->where('post_id', $post_id)->get();
- 
+            'comments.id',
+            'comments.post_id',
+            'comments.user_id',
+            'comments.comment',
+            'users.username',
+            'users.profile_pic',
+            'comments.created_at'
+        )->leftJoin('users', 'users.id', '=', 'comments.user_id')
+        ->where('comments.post_id', $post_id)
+        ->orderBy('comments.created_at', 'DESC')
+        ->paginate($limit, $offset);
+     
         if (isset($data)) {
             $message = __('user.comment_fetch_success');
             $status_code = SUCCESSCODE;
@@ -108,24 +120,24 @@ class CommentController extends Controller
         $status_code = BADREQUEST;
  
         $current_user = get_user();
-   
+        
         $inserted_data = Like::updateOrCreate(
             [
                 'user_id'=> $current_user->id,
-                'post_id'=>$request->post_id,
+                'post_id'=>$request->post_id,    
             ],
-            [
-           
-             'likes'=> DB::raw('likes+1'),
+            [  
+             'like'=> $request->like,
            ]
         );
-        
+
         $like= Like::select(
             'id',
             'post_id',
             'user_id',
-            'likes'
-        )->where('id', $inserted_data->id)->get()->first();
+            'like'
+        )->where('id',$inserted_data->id)->first();
+
         $message = __('user.add_like_success');
         $status_code = SUCCESSCODE;
           
@@ -166,5 +178,75 @@ class CommentController extends Controller
             'message' => $message,
             'status_code' => $status_code,
         ], $status_code);
+    }
+
+    public function reply(Request $request, $comment_id)
+    {
+        $data = [];
+       
+        $message = __('user.add_comment_failed');
+        $status_code = BADREQUEST;
+ 
+        $current_user = get_user();
+   
+        $data['post_id'] = $request->post_id;
+        $data['comment_id'] = $comment_id;
+        $data['user_id'] = $current_user->id;
+        $data['comment'] = $request->comment;
+        
+            
+        $inserted_data = ReplyComment::create($data);
+ 
+        $reply= ReplyComment::select(
+            'id',
+            'post_id',
+            'comment_id',
+            'user_id',
+            'comment'
+        )->where('id', $inserted_data->id)->get()->first();
+        $message = __('user.add_comment_success');
+        $status_code = SUCCESSCODE;
+          
+        return response([
+            'data' => $reply,
+            'message' => $message,
+            'status_code' => $status_code,
+        ], $status_code);
+    }
+
+    public function reply_fetch(Request $request, $comment_id)
+    {
+        $message =  __('user.comment_fetch failed');
+        $status_code = BADREQUEST;
+
+        $limit = !empty($request->input('limit')) ? $request->input('limit') : 10;
+  
+        $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
+        $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+ 
+        $data= ReplyComment::select(
+            'reply_comments.id',
+            'reply_comments.post_id',
+            'reply_comments.comment_id',
+            'reply_comments.user_id',
+            'reply_comments.comment',
+            'users.username',
+            'users.profile_pic',
+            'reply_comments.created_at'
+        )->leftJoin('users', 'users.id', '=', 'reply_comments.user_id')
+        ->where('reply_comments.comment_id', $comment_id)
+        ->orderBy('reply_comments.created_at', 'DESC')
+        ->paginate($limit, $offset);
+     
+        if (isset($data)) {
+            $message = __('user.comment_fetch_success');
+            $status_code = SUCCESSCODE;
+        }
+ 
+        return response([
+             'data'        => $data,
+             'message'     => $message,
+             'status_code' => $status_code
+         ], $status_code);
     }
 }

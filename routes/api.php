@@ -40,7 +40,7 @@ Route::group([
         Route::put('user', [UserController::class, 'set_up_account']);
 
         Route::get('user/artists', [UserController::class, 'artist_list']);
-        Route::get('user/artist/{artist_id}', [ArtistController::class, 'settings']);
+        Route::get('user/artist/{artist_id}', [ArtistController::class, 'user_artist']);
 
         Route::get('user/artist/{artist_id}/posts', [PostController::class, 'artist_publish_list']);
 
@@ -51,6 +51,8 @@ Route::group([
         Route::get('post/{post_id}/comment', [CommentController::class, 'fetch']);
         Route::delete('comment/{comment_id}', [CommentController::class, 'delete']);
 
+        Route::post('comment/{comment_id}/reply', [CommentController::class, 'reply']);
+        Route::get('comment/{comment_id}/reply', [CommentController::class, 'reply_fetch']);
 
         /********************** Like ************ */
         Route::post('like', [CommentController::class, 'add_like']);
@@ -65,7 +67,7 @@ Route::group([
         /***************** Upload ************* */
         Route::post('upload', [UploadController::class, 'upload']);
 
-        // Route::get('user_feed', [PostController::class, 'feed']);
+        Route::get('user_feed', [PostController::class, 'feed']);
          
         /********************** Notification************ */
         Route::post('notification', [NotificationController::class, 'notification_settings']);

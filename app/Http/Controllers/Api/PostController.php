@@ -29,7 +29,7 @@ class PostController extends Controller
         $post_data['date'] = $request->date;
         if ($request->time) {
             $post_data['time'] = date("H:i:s", strtotime($request->time));
-        }else{
+        } else {
             $post_data['time'] =null;
         }
         $post_data['user_id'] = $current_user->id;
@@ -84,7 +84,7 @@ class PostController extends Controller
             'created_at',
             DB::raw("DATE_FORMAT(posts.time, '%h:%i %p') as time"),
         )->where('id', $inserted_data->id)->get()->first();
-        ;
+
         $status_code = SUCCESSCODE;
         $message = __('user.post_success');
         
@@ -276,7 +276,8 @@ class PostController extends Controller
             'posts.created_at',
         ) ->leftJoin('users', 'users.id', '=', 'posts.user_id')
         ->where('posts.when_to_post_id', '=', '1')
-        ->where('posts.user_id', $current_user->id)->get();
+        ->where('posts.user_id', $current_user->id)
+        ->orderBy('posts.created_at', 'DESC')->get();
  
         if (isset($post)) {
             $message = __('user.post_fetch_success');
@@ -319,7 +320,8 @@ class PostController extends Controller
             'posts.created_at',
         )->leftJoin('users', 'users.id', '=', 'posts.user_id')
         ->where('posts.when_to_post_id', '=', '2')
-        ->where('posts.user_id', $current_user->id)->get();
+        ->where('posts.user_id', $current_user->id)
+        ->orderBy('posts.created_at', 'DESC')->get();
       
  
         if (isset($post)) {
@@ -335,7 +337,7 @@ class PostController extends Controller
     }
 
     public function saved_list(Request $request)
-    {  
+    {
         $data = [];
         $message = __('user.post_fetch failed');
         $status_code = BADREQUEST;
@@ -363,7 +365,8 @@ class PostController extends Controller
             'posts.created_at',
         )->leftJoin('users', 'users.id', '=', 'posts.user_id')
         ->where('posts.when_to_post_id', '=', '3')
-        ->where('posts.user_id', $current_user->id)->get();
+        ->where('posts.user_id', $current_user->id)
+        ->orderBy('posts.created_at', 'DESC')->get();
  
         if (isset($post)) {
             $message = "Saved Post";
@@ -398,30 +401,36 @@ class PostController extends Controller
         ], $status_code);
     }
 
-    public function artist_publish_list(Request $request,$artist_id)
+    public function artist_publish_list(Request $request, $artist_id)
     {
         $data = [];
         $message = "Failed to fetch artist post";
         $status_code = BADREQUEST;
 
-         $post = Post::select(
-            'id',
-            'title',
-            'content',
-            'image',
-            'video',
-            'audio',
-            'live_stream',
-            'when_to_post_id',
-            'user_id',
-            'who_can_see_post_id',
-            'post_type_id',
-            'time',
-            'date',
-            'created_at',
-            'deleted_at',
-        )->where('when_to_post_id', '=', '1')
-        ->where('user_id', $artist_id)->get();
+        $post = Post::select(
+            'posts.id',
+            'posts.title',
+            'posts.content',
+            'posts.image',
+            'posts.video',
+            'posts.audio',
+            'posts.live_stream',
+            'posts.when_to_post_id',
+            'posts.user_id',
+            'posts.who_can_see_post_id',
+            'posts.post_type_id',
+            'posts.time',
+            'posts.date',
+            'posts.deleted_at',
+            'users.id',
+            'users.name',
+            'users.username',
+            'users.profile_pic',
+            'posts.created_at',
+        )->leftJoin('users', 'users.id', '=', 'posts.user_id')
+        ->where('posts.when_to_post_id', '=', '1')
+        ->where('posts.user_id', $artist_id)
+        ->orderBy('posts.created_at', 'DESC')->get();
  
         if (isset($post)) {
             $message = "Artist Post";
@@ -438,44 +447,42 @@ class PostController extends Controller
     public function feed(Request $request)
     {
         $data = [];
-        $message = __('user.user_subscription_failed');
+        $message = "Failed to fetch feed details";
         $status_code = BADREQUEST;
 
         $current_user = get_user();
 
         $users= Post::select(
-           
-            'users.name',
-            'users.username',
-            'users.profile_pic',
-            'posts.id',
-            'posts.title',
-            'posts.content',
-            'posts.image',
-            'posts.video',
-            'posts.audio',
-            'posts.live_stream',
-            'posts.when_to_post_id',
-            'posts.user_id as post_user_id',
-            'posts.who_can_see_post_id',
-            'posts.post_type_id',
-            'posts.time',
-            'posts.date',
-            'posts.created_at',
-            'posts.deleted_at',
-            'user_subscriptions.user_id'
-            
-        )
-        ->leftJoin('subscriptions', 'subscriptions.user_id', '=', 'posts.user_id')
-       ->leftJoin('user_subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
-        ->leftJoin('users', 'subscriptions.user_id', '=', 'users.id')
-   ->where('user_subscriptions.user_id', $current_user->id)
-         ->where('user_subscriptions.deleted_at', null)
-        ->where('user_subscriptions.status', 1)
-         ->get();
-        $message = __('user.user_subscription');
+                        'users.name',
+                        'users.username',
+                        'users.profile_pic',
+                        'posts.id',
+                        'posts.title',
+                        'posts.content',
+                        'posts.image',
+                        'posts.video',
+                        'posts.audio',
+                        'posts.live_stream',
+                        'posts.when_to_post_id',
+                        'posts.user_id as post_user_id',
+                        'posts.who_can_see_post_id',
+                        'posts.post_type_id',
+                        'posts.time',
+                        'posts.date',
+                        'posts.created_at',
+                        'posts.deleted_at',
+                        'user_subscriptions.user_id'
+                    )
+                    ->leftJoin('subscriptions', 'subscriptions.user_id', '=', 'posts.user_id')
+                    ->leftJoin('user_subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
+                    ->leftJoin('users', 'subscriptions.user_id', '=', 'users.id')
+                    ->where('user_subscriptions.user_id', $current_user->id)
+                    ->where('user_subscriptions.deleted_at', null)
+                    ->where('user_subscriptions.status', 1)
+                    ->get();
+        $message = "User Feed";
         $status_code = SUCCESSCODE;
-        print_r( $current_user->id);
+     
         return response([
             'data' => $users,
             'message' => $message,

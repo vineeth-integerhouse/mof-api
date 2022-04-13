@@ -10,7 +10,7 @@ class Like extends Model
 {
     use HasFactory,SoftDeletes;
 
-    public $fillable = ['user_id','post_id', 'likes'];
+    public $fillable = ['user_id','post_id', 'like'];
 
     public function post()
     {
