@@ -188,33 +188,208 @@ class PaymentController extends Controller
   
         $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
         $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
-  
-        $payment = Payment::select(
-            'payments.id',
-            'payments.name',
-            'payment_date',
-            'amount',
-            'stripe_reference_number',
-            'status',
-            'payer',
-            'payee',
-            'profile_pic',
-            'payin_payout',
-            'username'
-        )->leftJoin('users', 'users.id', '=', 'payments.payer')
-        ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
-        ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
-  
-        if (isset($payment)) {
-            $data = $payment;
-            $payment_data['Total Revenue'] = Payment::select('amount')->where('payin_payout','Payin')->get()->sum('amount');
 
-            $total_payout=Payment::select('amount')->where('payin_payout','Payouts')->get()->sum('amount');
-            $payment_data['Total Profit'] =  $payment_data['Total Revenue'] - $total_payout;
+        if ($request->input('filter_option') == '') {
+            $payment = Payment::select(
+                'payments.id',
+                'payments.name',
+                'payment_date',
+                'amount',
+                'stripe_reference_number',
+                'status',
+                'payer',
+                'payee',
+                'profile_pic',
+                'payin_payout',
+                'username'
+            )->leftJoin('users', 'users.id', '=', 'payments.payer')
+            ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
+            ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+
+            if (isset($payment)) {
+                $data = $payment;
+                $payment_data['Total Revenue'] = Payment::select('amount')->where('payin_payout', 'Payin')->get()->sum('amount');
+    
+                $total_payout=Payment::select('amount')->where('payin_payout', 'Payouts')->get()->sum('amount');
+                $payment_data['Total Profit'] =  $payment_data['Total Revenue'] - $total_payout;
+            }
+        } elseif ($request->input('filter_option') == 'all_time') {
+            $payment = Payment::select(
+                'payments.id',
+                'payments.name',
+                'payment_date',
+                'amount',
+                'stripe_reference_number',
+                'status',
+                'payer',
+                'payee',
+                'profile_pic',
+                'payin_payout',
+                'username'
+            )->leftJoin('users', 'users.id', '=', 'payments.payer')
+            ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
+            ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+
+            if (isset($payment)) {
+                $data = $payment;
+                $payment_data['Total Revenue'] = Payment::select('amount')->where('payin_payout', 'Payin')->get()->sum('amount');
+    
+                $total_payout=Payment::select('amount')->where('payin_payout', 'Payouts')->get()->sum('amount');
+                $payment_data['Total Profit'] =  $payment_data['Total Revenue'] - $total_payout;
+            }
+        
+        } elseif ($request->input('filter_option') == 'today') {
+            $start_date = date('Y-m-d');
+            $end_date = date('Y-m-d');
+           
+            $payment = Payment::select(
+                'payments.id',
+                'payments.name',
+                'payment_date',
+                'amount',
+                'stripe_reference_number',
+                'status',
+                'payer',
+                'payee',
+                'profile_pic',
+                'payin_payout',
+                'username'
+            )->leftJoin('users', 'users.id', '=', 'payments.payer')
+            ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
+            ->whereDate('payments.created_at', '>=', $start_date) 
+            ->whereDate('payments.created_at', '<=', $end_date)
+            ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+
+            if (isset($payment)) {
+                $data = $payment;
+                $payment_data['Total Revenue'] = Payment::select('amount')->where('payin_payout', 'Payin')->whereDate('created_at', '>=', $start_date)->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+    
+                $total_payout=Payment::select('amount')->where('payin_payout', 'Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+                $payment_data['Total Profit'] =  $payment_data['Total Revenue'] - $total_payout;
+            }
+            
+        }elseif ($request->input('filter_option') == 'this_week') {
+            $start_date = date('Y-m-d', strtotime('-1 week monday 00:00:00'));
+            $end_date = date('Y-m-d', strtotime('sunday 23:59:59'));
+           
+            $payment = Payment::select(
+                'payments.id',
+                'payments.name',
+                'payment_date',
+                'amount',
+                'stripe_reference_number',
+                'status',
+                'payer',
+                'payee',
+                'profile_pic',
+                'payin_payout',
+                'username'
+            )->leftJoin('users', 'users.id', '=', 'payments.payer')
+            ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
+            ->whereDate('payments.created_at', '>=', $start_date) 
+            ->whereDate('payments.created_at', '<=', $end_date)
+            ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+
+            if (isset($payment)) {
+                $data = $payment;
+                $payment_data['Total Revenue'] = Payment::select('amount')->where('payin_payout', 'Payin')->whereDate('created_at', '>=', $start_date)->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+    
+                $total_payout=Payment::select('amount')->where('payin_payout', 'Payouts')->whereDate('created_at', '>=', $start_date)->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+                $payment_data['Total Profit'] =  $payment_data['Total Revenue'] - $total_payout;
+            }
+        }elseif ($request->input('filter_option') == 'this_month') {
+            $year = date('Y');
+            $month = date('m');
+
+            $payment = Payment::select(
+                'payments.id',
+                'payments.name',
+                'payment_date',
+                'amount',
+                'stripe_reference_number',
+                'status',
+                'payer',
+                'payee',
+                'profile_pic',
+                'payin_payout',
+                'username'
+            )->leftJoin('users', 'users.id', '=', 'payments.payer')
+            ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
+            ->whereMonth('payments.created_at', '=', $month)
+            ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+
+            if (isset($payment)) {
+                $data = $payment;
+                $payment_data['Total Revenue'] = Payment::select('amount')->where('payin_payout', 'Payin')->whereMonth('created_at', '=', $month)->get()->sum('amount');
+    
+                $total_payout=Payment::select('amount')->where('payin_payout', 'Payouts')->whereMonth('created_at', '=', $month)->get()->sum('amount');
+                $payment_data['Total Profit'] =  $payment_data['Total Revenue'] - $total_payout;
+            }
+
+        }  elseif ($request->input('filter_option') == 'six_month') {
+            $start_date = date('Y-m-d', strtotime('-6 months 00:00:00'));
+            $end_date = date('Y-m-d', strtotime('sunday 23:59:59'));
+  
+            $payment = Payment::select(
+                'payments.id',
+                'payments.name',
+                'payment_date',
+                'amount',
+                'stripe_reference_number',
+                'status',
+                'payer',
+                'payee',
+                'profile_pic',
+                'payin_payout',
+                'username'
+            )->leftJoin('users', 'users.id', '=', 'payments.payer')
+            ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
+            ->whereDate('payments.created_at', '>=', $start_date) 
+            ->whereDate('payments.created_at', '<=', $end_date)
+            ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+
+            if (isset($payment)) {
+                $data = $payment;
+                $payment_data['Total Revenue'] = Payment::select('amount')->where('payin_payout', 'Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+    
+                $total_payout=Payment::select('amount')->where('payin_payout', 'Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+                $payment_data['Total Profit'] =  $payment_data['Total Revenue'] - $total_payout;
+            }
+        } elseif ($request->input('filter_option') == 'choose_date') {
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
+            
+            $payment = Payment::select(
+                'payments.id',
+                'payments.name',
+                'payment_date',
+                'amount',
+                'stripe_reference_number',
+                'status',
+                'payer',
+                'payee',
+                'profile_pic',
+                'payin_payout',
+                'username'
+            )->leftJoin('users', 'users.id', '=', 'payments.payer')
+            ->where(DB::raw('payments.payin_payout'), '=', 'Payin')
+            ->whereDate('payments.created_at', '>=', $start_date) 
+            ->whereDate('payments.created_at', '<=', $end_date)
+            ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+
+            if (isset($payment)) {
+                $data = $payment;
+                $payment_data['Total Revenue'] = Payment::select('amount')->where('payin_payout', 'Payin')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+    
+                $total_payout=Payment::select('amount')->where('payin_payout', 'Payouts')->whereDate('created_at', '>=', $start_date) ->whereDate('created_at', '<=', $end_date)->get()->sum('amount');
+                $payment_data['Total Profit'] =  $payment_data['Total Revenue'] - $total_payout;
+            }
+        }
+    
 
             $message = __('user.fetch_payment_success');
             $status_code = SUCCESSCODE;
-        }
+    
         return response([
               'data' => $data,
               'payment_data' => $payment_data,
@@ -274,22 +449,168 @@ class PaymentController extends Controller
    
          $page = (!empty($request->input('page')) && $request->input('page') > 0) ? intval($request->input('page')) : 1;
          $offset = ($page > 1) ? ($limit * ($page - 1)) : 0;
+
+         if ($request->input('filter_option') == '') {
+            $payment = Payment::select(
+           'payments.id',
+           'users.name',
+           'payment_date',
+           'amount',
+           'stripe_reference_number',
+           'status',
+           'payer',
+           'payee',
+           'profile_pic',
+           'payin_payout',
+           'username'
+       )->leftJoin('users', 'users.id', '=', 'payments.payee')
+       ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
+       ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+      } elseif ($request->input('filter_option') == 'all_time') {
+        $payment = Payment::select(
+           'payments.id',
+           'users.name',
+           'payment_date',
+           'amount',
+           'stripe_reference_number',
+           'status',
+           'payer',
+           'payee',
+           'profile_pic',
+           'payin_payout',
+           'username'
+       )->leftJoin('users', 'users.id', '=', 'payments.payee')
+       ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
+       ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+      } elseif ($request->input('filter_option') == 'today') {
+          $start_date = date('Y-m-d');
+          $end_date = date('Y-m-d');
+          
+             $payment = Payment::select(
+           'payments.id',
+           'users.name',
+           'payment_date',
+           'amount',
+           'stripe_reference_number',
+           'status',
+           'payer',
+           'payee',
+           'profile_pic',
+           'payin_payout',
+           'username'
+       )->leftJoin('users', 'users.id', '=', 'payments.payee')
+       ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
+       ->whereDate('payments.created_at', '>=', $start_date) 
+          ->whereDate('payments.created_at', '<=', $end_date)
+       ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+         
+            
+      }elseif ($request->input('filter_option') == 'this_week') {
+          $start_date = date('Y-m-d', strtotime('-1 week monday 00:00:00'));
+          $end_date = date('Y-m-d', strtotime('sunday 23:59:59'));
+         
+            $payment = Payment::select(
+           'payments.id',
+           'users.name',
+           'payment_date',
+           'amount',
+           'stripe_reference_number',
+           'status',
+           'payer',
+           'payee',
+           'profile_pic',
+           'payin_payout',
+           'username'
+       )->leftJoin('users', 'users.id', '=', 'payments.payee')
+       ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
+       ->whereDate('payments.created_at', '>=', $start_date) 
+          ->whereDate('payments.created_at', '<=', $end_date)
+       ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+       
+     
+      }elseif ($request->input('filter_option') == 'this_month') {
+          $year = date('Y');
+          $month = date('m');
+          
+           $payment = Payment::select(
+           'payments.id',
+           'users.name',
+           'payment_date',
+           'amount',
+           'stripe_reference_number',
+           'status',
+           'payer',
+           'payee',
+           'profile_pic',
+           'payin_payout',
+           'username'
+       )->leftJoin('users', 'users.id', '=', 'payments.payee')
+       ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
+       ->whereMonth('payments.created_at', '=', $month)
+       ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+       
+
+      }  elseif ($request->input('filter_option') == 'six_month') {
+          $start_date = date('Y-m-d', strtotime('-6 months 00:00:00'));
+          $end_date = date('Y-m-d', strtotime('sunday 23:59:59'));
+          
+           $payment = Payment::select(
+           'payments.id',
+           'users.name',
+           'payment_date',
+           'amount',
+           'stripe_reference_number',
+           'status',
+           'payer',
+           'payee',
+           'profile_pic',
+           'payin_payout',
+           'username'
+       )->leftJoin('users', 'users.id', '=', 'payments.payee')
+       ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
+    ->whereDate('payments.created_at', '>=', $start_date) 
+          ->whereDate('payments.created_at', '<=', $end_date)
+       ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+
+
+      } elseif ($request->input('filter_option') == 'choose_date') {
+          $start_date = $request->start_date;
+          $end_date = $request->end_date;
+          
+               $payment = Payment::select(
+           'payments.id',
+           'users.name',
+           'payment_date',
+           'amount',
+           'stripe_reference_number',
+           'status',
+           'payer',
+           'payee',
+           'profile_pic',
+           'payin_payout',
+           'username'
+       )->leftJoin('users', 'users.id', '=', 'payments.payee')
+       ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
+    ->whereDate('payments.created_at', '>=', $start_date) 
+          ->whereDate('payments.created_at', '<=', $end_date)
+       ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+       }
    
-         $payment = Payment::select(
-             'payments.id',
-             'users.name',
-             'payment_date',
-             'amount',
-             'stripe_reference_number',
-             'status',
-             'payer',
-             'payee',
-             'profile_pic',
-             'payin_payout',
-             'username'
-         )->leftJoin('users', 'users.id', '=', 'payments.payee')
-         ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
-         ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
+        //  $payment = Payment::select(
+        //      'payments.id',
+        //      'users.name',
+        //      'payment_date',
+        //      'amount',
+        //      'stripe_reference_number',
+        //      'status',
+        //      'payer',
+        //      'payee',
+        //      'profile_pic',
+        //      'payin_payout',
+        //      'username'
+        //  )->leftJoin('users', 'users.id', '=', 'payments.payee')
+        //  ->where(DB::raw('payments.payin_payout'), '=', 'Payouts')
+        //  ->orderBy(DB::raw('payments.'.$sort_column), $sort_direction)->paginate($limit, $offset);
    
          if (isset($payment)) {
              $data = $payment;

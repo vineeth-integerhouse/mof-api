@@ -51,6 +51,21 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function post()
+    {
+        return $this->belongsTo(Post::class);
+    }
+
+    public function tagOwner()
+    {
+        return $this->belongsToMany(PostTag::class,'user_id');
+    }
+
+    public function postTag()
+    {
+        return $this->belongsToMany(PostTag::class,'tagged_user_id');
+    }
+
     public function profile_view()
     {
         return $this->hasMany(ProfileView::class);
@@ -124,6 +139,7 @@ class User extends Authenticatable
             'profile_pic',
         )->where('id', '!=', $current_user->id)
         ->where('role_id', $user_role)
+        ->whereNull('deleted_at')
         ->where(
             function ($query) use ($request) {
                 return $query

@@ -249,4 +249,32 @@ class CommentController extends Controller
              'status_code' => $status_code
          ], $status_code);
     }
+
+    public function like_fetch(Request $request, $post_id, $user_id)
+    {
+        $message =  "No like";
+        $status_code = SUCCESSCODE;
+        
+        $data= like::select(
+            'id',
+            'post_id',
+            'user_id',
+            'like',
+        )
+        ->where('post_id', $post_id)
+        ->where('user_id', $user_id)
+        ->orderBy('created_at', 'DESC')
+        ->first();
+     
+        if (isset($data)) {
+            $message = "Post likes";
+            $status_code = SUCCESSCODE;
+        }
+ 
+        return response([
+             'data'        => $data,
+             'message'     => $message,
+             'status_code' => $status_code
+         ], $status_code);
+    }
 }
