@@ -56,6 +56,7 @@ Route::group([
 
         /********************** Like ************ */
         Route::post('like', [CommentController::class, 'add_like']);
+        Route::get('post/{post_id}/like/{user_id}', [CommentController::class, 'like_fetch']);
 
           /********************** Profile View ************ */
           Route::post('profile_view', [CommentController::class, 'profile_views']);
