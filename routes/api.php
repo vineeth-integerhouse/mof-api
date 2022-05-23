@@ -63,6 +63,8 @@ Route::group([
 
         /***************** Payment ************* */
         Route::post('payment', [PaymentController::class, 'stripe']);
+        Route::post('card', [PaymentController::class, 'add']);
+        Route::get('card', [PaymentController::class, 'get']);
         Route::put('payment', [PaymentController::class, 'update']);
 
         /***************** Upload ************* */

@@ -88,25 +88,28 @@ class PostController extends Controller
             DB::raw("DATE_FORMAT(posts.time, '%h:%i %p') as time"),
         )->where('id', $inserted_data->id)->get()->first();
 
-        $tag_id= $request->tag_id;
-        $tag_ids = explode(',', $tag_id);
+        if ($request->tag_id) {
+            $tag_id= $request->tag_id;
+            $tag_ids = explode(',', $tag_id);
        
-        if (isset($tag_ids)) {
-            for ($i=0;$i<count($tag_ids);$i++) {
-                $tag_data = ['user_id'=>$current_user->id, 'tagged_user_id' => $tag_ids[$i], 'post_id'=>$inserted_data->id];
-                PostTag::updateOrCreate($tag_data);
+            if (isset($tag_ids)) {
+                for ($i=0;$i<count($tag_ids);$i++) {
+                    $tag_data = ['user_id'=>$current_user->id, 'tagged_user_id' => $tag_ids[$i], 'post_id'=>$inserted_data->id];
+                    PostTag::updateOrCreate($tag_data);
+                }
             }
+        
+            $data['tag_id']= PostTag::select(
+                'post_tags.id',
+                'post_tags.tagged_user_id',
+                'users.name',
+                'users.username',
+                'users.profile_pic',
+            )
+                                    ->leftJoin('users', 'users.id', '=', 'post_tags.tagged_user_id')
+                                    ->where('user_id', $current_user->id)
+                                    ->where('post_id', $inserted_data->id)->get();
         }
-        $data['tag_id']= PostTag::select(
-            'post_tags.id',
-            'post_tags.tagged_user_id',
-            'users.name',
-            'users.username',
-            'users.profile_pic',
-        )->leftJoin('users', 'users.id', '=', 'post_tags.tagged_user_id')
-        ->where('user_id', $current_user->id)
-        ->where('post_id', $inserted_data->id)->get();
-
         $status_code = SUCCESSCODE;
         $message = __('user.post_success');
         
@@ -284,12 +287,65 @@ class PostController extends Controller
         $status_code = BADREQUEST;
 
         $current_user = get_user();
- 
-        $post = Post::with(['user','postTag.taggedUser'])
+
+        if ($request->input('filter_option') == '') {
+            $post = Post::with(['user','postTag.taggedUser'])
                     ->where('posts.user_id', $current_user->id)
                     ->where('posts.when_to_post_id', '=', '1')
                     ->orderBy('posts.created_at', 'DESC')
                     ->get();
+        }elseif ($request->input('filter_option') == 'all_time') {
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '1')
+            ->orderBy('posts.created_at', 'DESC')
+            ->get();
+        } elseif ($request->input('filter_option') == 'last_7days') {
+            $start_date = date('Y-m-d', strtotime('-7 days'));
+            $end_date = date('Y-m-d');
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '1')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
+        }elseif ($request->input('filter_option') == 'this_month') {
+            $year = date('Y');
+            $month = date('m');
+
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '1')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereYear('created_at', '=', $year)
+            ->whereMonth('created_at', '=', $month)
+            ->get();
+        }elseif ($request->input('filter_option') == 'this_year') {
+            $year = date('Y');
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '1')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereYear('created_at', '=', $year)
+            ->get();
+        } elseif ($request->input('filter_option') == 'choose_date') {
+
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '1')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
+        }
+
     
         if (isset($post)) {
             $message = __('user.post_fetch_success');
@@ -311,11 +367,63 @@ class PostController extends Controller
 
         $current_user = get_user();
 
-        $post = Post::with(['user','postTag.taggedUser'])
+        if ($request->input('filter_option') == '') {
+            $post = Post::with(['user','postTag.taggedUser'])
                     ->where('posts.user_id', $current_user->id)
                     ->where('posts.when_to_post_id', '=', '2')
                     ->orderBy('posts.created_at', 'DESC')
                     ->get();
+        }elseif ($request->input('filter_option') == 'all_time') {
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '2')
+            ->orderBy('posts.created_at', 'DESC')
+            ->get();
+        } elseif ($request->input('filter_option') == 'last_7days') {
+            $start_date = date('Y-m-d', strtotime('-7 days'));
+            $end_date = date('Y-m-d');
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '2')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
+        }elseif ($request->input('filter_option') == 'this_month') {
+            $year = date('Y');
+            $month = date('m');
+
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '2')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereYear('created_at', '=', $year)
+            ->whereMonth('created_at', '=', $month)
+            ->get();
+        }elseif ($request->input('filter_option') == 'this_year') {
+            $year = date('Y');
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '2')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereYear('created_at', '=', $year)
+            ->get();
+        } elseif ($request->input('filter_option') == 'choose_date') {
+
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '2')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
+        }
  
         if (isset($post)) {
             $message = "Scheduled Post";
@@ -337,11 +445,63 @@ class PostController extends Controller
  
         $current_user = get_user();
 
-        $post = Post::with(['user','postTag.taggedUser'])
-        ->where('posts.user_id', $current_user->id)
-        ->where('posts.when_to_post_id', '=', '3')
-        ->orderBy('posts.created_at', 'DESC')
-        ->get();
+        if ($request->input('filter_option') == '') {
+            $post = Post::with(['user','postTag.taggedUser'])
+                    ->where('posts.user_id', $current_user->id)
+                    ->where('posts.when_to_post_id', '=', '3')
+                    ->orderBy('posts.created_at', 'DESC')
+                    ->get();
+        }elseif ($request->input('filter_option') == 'all_time') {
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '3')
+            ->orderBy('posts.created_at', 'DESC')
+            ->get();
+        } elseif ($request->input('filter_option') == 'last_7days') {
+            $start_date = date('Y-m-d', strtotime('-7 days'));
+            $end_date = date('Y-m-d');
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '3')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
+        }elseif ($request->input('filter_option') == 'this_month') {
+            $year = date('Y');
+            $month = date('m');
+
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '3')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereYear('created_at', '=', $year)
+            ->whereMonth('created_at', '=', $month)
+            ->get();
+        }elseif ($request->input('filter_option') == 'this_year') {
+            $year = date('Y');
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '3')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereYear('created_at', '=', $year)
+            ->get();
+        } elseif ($request->input('filter_option') == 'choose_date') {
+
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
+
+            $post = Post::with(['user','postTag.taggedUser'])
+            ->where('posts.user_id', $current_user->id)
+            ->where('posts.when_to_post_id', '=', '3')
+            ->orderBy('posts.created_at', 'DESC')
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->get();
+        }
         
         if (isset($post)) {
             $message = "Saved Post";
@@ -427,27 +587,28 @@ class PostController extends Controller
 
         $current_user = get_user();
 
-        $users= Post::select(
-            'users.name',
-            'users.username',
-            'users.profile_pic',
-            'posts.id',
-            'posts.title',
-            'posts.content',
-            'posts.image',
-            'posts.video',
-            'posts.audio',
-            'posts.live_stream',
-            'posts.when_to_post_id',
-            'posts.user_id as post_user_id',
-            'posts.who_can_see_post_id',
-            'posts.post_type_id',
-            'posts.time',
-            'posts.date',
-            'posts.created_at',
-            'posts.deleted_at',
-            'user_subscriptions.user_id'
-        )
+        if ($request->input('filter_option') == 'media_type') {
+            $users= Post::select(
+                'users.name',
+                'users.username',
+                'users.profile_pic',
+                'posts.id',
+                'posts.title',
+                'posts.content',
+                'posts.image',
+                'posts.video',
+                'posts.audio',
+                'posts.live_stream',
+                'posts.when_to_post_id',
+                'posts.user_id as post_user_id',
+                'posts.who_can_see_post_id',
+                'posts.post_type_id',
+                'posts.time',
+                'posts.date',
+                'posts.created_at',
+                'posts.deleted_at',
+                'user_subscriptions.user_id'
+            )
                     ->leftJoin('subscriptions', 'subscriptions.user_id', '=', 'posts.user_id')
                     ->leftJoin('user_subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
                     ->leftJoin('users', 'subscriptions.user_id', '=', 'users.id')
@@ -455,6 +616,85 @@ class PostController extends Controller
                     ->where('user_subscriptions.deleted_at', null)
                     ->where('user_subscriptions.status', 1)
                     ->get();
+        }elseif ($request->input('filter_option') == 'photos') {
+            $users= Post::select(
+                'users.name',
+                'users.username',
+                'users.profile_pic',
+                'posts.id',
+                'posts.title',
+                'posts.content',
+                'posts.image',
+                'posts.when_to_post_id',
+                'posts.user_id as post_user_id',
+                'posts.who_can_see_post_id',
+                'posts.post_type_id',
+                'posts.time',
+                'posts.date',
+                'posts.created_at',
+                'posts.deleted_at',
+                'user_subscriptions.user_id'
+            )
+                    ->leftJoin('subscriptions', 'subscriptions.user_id', '=', 'posts.user_id')
+                    ->leftJoin('user_subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
+                    ->leftJoin('users', 'subscriptions.user_id', '=', 'users.id')
+                    ->where('user_subscriptions.user_id', $current_user->id)
+                    ->where('user_subscriptions.deleted_at', null)
+                    ->where('user_subscriptions.status', 1)
+                    ->get();
+        }elseif ($request->input('filter_option') == 'videos') {
+            $users= Post::select(
+                'users.name',
+                'users.username',
+                'users.profile_pic',
+                'posts.id',
+                'posts.title',
+                'posts.content',
+                'posts.video',
+                'posts.when_to_post_id',
+                'posts.user_id as post_user_id',
+                'posts.who_can_see_post_id',
+                'posts.post_type_id',
+                'posts.time',
+                'posts.date',
+                'posts.created_at',
+                'posts.deleted_at',
+                'user_subscriptions.user_id'
+            )
+                    ->leftJoin('subscriptions', 'subscriptions.user_id', '=', 'posts.user_id')
+                    ->leftJoin('user_subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
+                    ->leftJoin('users', 'subscriptions.user_id', '=', 'users.id')
+                    ->where('user_subscriptions.user_id', $current_user->id)
+                    ->where('user_subscriptions.deleted_at', null)
+                    ->where('user_subscriptions.status', 1)
+                    ->get();
+        }elseif ($request->input('filter_option') == 'live_stream') {
+            $users= Post::select(
+                'users.name',
+                'users.username',
+                'users.profile_pic',
+                'posts.id',
+                'posts.title',
+                'posts.content',
+                'posts.live_stream',
+                'posts.when_to_post_id',
+                'posts.user_id as post_user_id',
+                'posts.who_can_see_post_id',
+                'posts.post_type_id',
+                'posts.time',
+                'posts.date',
+                'posts.created_at',
+                'posts.deleted_at',
+                'user_subscriptions.user_id'
+            )
+                    ->leftJoin('subscriptions', 'subscriptions.user_id', '=', 'posts.user_id')
+                    ->leftJoin('user_subscriptions', 'subscriptions.id', '=', 'user_subscriptions.subscribe_id')
+                    ->leftJoin('users', 'subscriptions.user_id', '=', 'users.id')
+                    ->where('user_subscriptions.user_id', $current_user->id)
+                    ->where('user_subscriptions.deleted_at', null)
+                    ->where('user_subscriptions.status', 1)
+                    ->get();
+        }
         $message = "User Feed";
         $status_code = SUCCESSCODE;
      
